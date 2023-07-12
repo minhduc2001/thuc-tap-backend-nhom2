@@ -9,7 +9,13 @@ import { UserModule } from './user/user.module';
 const baseModules = [ConfigModule, LoggerModule];
 const appModules = [];
 @Module({
-  imports: [...baseModules, ...appModules, TypeOrmModule.forRoot(dbConfig), AuthModule, UserModule],
+  imports: [
+    ...baseModules,
+    ...appModules,
+    TypeOrmModule.forRoot(dbConfig),
+    AuthModule,
+    UserModule,
+  ],
   controllers: [],
   providers: [],
 })
