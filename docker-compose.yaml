@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: thuctapnhom2
+    image: postgres:13.6-alpine
+    restart: always
+    environment:
+      TZ: 'Asia/Ho_Chi_Minh'
+      PGTZ: 'Asia/Ho_Chi_Minh'
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    command: postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+    ports:
+      - ${DB_PORT:-5432}:5432
+    networks:
+      - thuc-tap-network
+    volumes:
+      - ./docker/database/postgres/data/:/var/lib/postgresql/data
+      - ./docker/database/postgres/postgres.conf:/etc/postgresql/postgresql.conf
+      - ./docker/database/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./docker/database/postgres/init/:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+
+networks:
+  thuc-tap-network:
+    driver: bridge
