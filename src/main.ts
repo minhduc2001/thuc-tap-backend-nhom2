@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { ResponseTransformInterceptor } from './base/middlewares/response.interceptor';
@@ -18,6 +19,7 @@ async function bootstrap() {
 
   app.use(`/uploads`, express.static('uploads'));
   app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(cookieParser());
   app.use(morgan('dev'));
 
   app.useGlobalInterceptors(new ResponseTransformInterceptor());
