@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from './base/config';
+import { LoggerModule } from './base/logger/logger.module';
 
+const baseModules = [ConfigModule, LoggerModule];
+const appModules = [];
 @Module({
-  imports: [ConfigModule],
+  imports: [...baseModules, ...appModules],
   controllers: [],
   providers: [],
 })
