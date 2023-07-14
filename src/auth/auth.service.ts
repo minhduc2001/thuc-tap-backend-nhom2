@@ -89,4 +89,6 @@ export class AuthService {
     user.uav = new Date().getTime();
     await user.save();
   }
+
+  async thirdPartyLogin(data: any) {}
 }

@@ -28,6 +28,14 @@ export class ConfigService {
   JWT_SECRET = _process.env.JWT_SECRET;
   JWT_RT_SECRET = _process.env.JWT_RT_SECRET;
 
+  // google auth
+  GOOGLE_CLIENT_SECRET = _process.env.GOOGLE_CLIENT_SECRET;
+  GOOGLE_CLIENT_ID = _process.env.GOOGLE_CLIENT_ID;
+
+  //facebook auth
+  FACEBOOK_APP_ID = _process.env.FACEBOOK_APP_ID;
+  FACEBOOK_APP_SECRET = _process.env.FACEBOOK_APP_SECRET;
+
   // mailer
   EMAIL = _process.env.EMAIL;
   MAIL_PASSWORD = _process.env.MAIL_PASSWORD;
