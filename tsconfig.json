@@ -23,5 +23,7 @@
       "@base/*": ["src/base/*"],
       "@/config": ["src/base/config"]
     }
-  }
+  },
+  "include": ["src"],
+  "exclude": ["audio"]
 }

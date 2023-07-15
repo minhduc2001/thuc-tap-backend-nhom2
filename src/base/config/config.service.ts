@@ -36,6 +36,11 @@ export class ConfigService {
   FACEBOOK_APP_ID = _process.env.FACEBOOK_APP_ID;
   FACEBOOK_APP_SECRET = _process.env.FACEBOOK_APP_SECRET;
 
+  // Firebase
+  FIREBASE_PROJECT_ID = _process.env.FIREBASE_PROJECT_ID;
+  FIREBASE_PRIVATE_KEY = _process.env.FIREBASE_PRIVATE_KEY;
+  FIREBASE_CLIENT_EMAIL = _process.env.FIREBASE_CLIENT_EMAIL;
+
   // mailer
   EMAIL = _process.env.EMAIL;
   MAIL_PASSWORD = _process.env.MAIL_PASSWORD;
