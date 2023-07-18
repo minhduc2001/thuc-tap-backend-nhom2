@@ -14,12 +14,10 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
       ignoreExpiration: true,
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          console.log('vaoday', request?.cookies?.['auth-cookie']);
           const data = request?.cookies?.['auth-cookie'];
           if (!data) {
             return null;
           }
-          console.log(data);
           return data;
         },
       ]),
@@ -29,7 +27,6 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   }
 
   async validate(req: Request, payload: any) {
-    console.log('xuong cgo ay');
     if (!payload) {
       throw new exc.Forbidden({ message: 'invalid jwt token' });
     }
@@ -39,9 +36,12 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     }
     const user = await this.userService.validRefreshToken(payload.sub, token);
     if (!user) {
-      throw new exc.Forbidden({ message: 'token expired' });
+      throw new exc.Forbidden({ message: 'token valid fail' });
     }
 
-    return user;
+    return {
+      ...user,
+      refreshToken: token,
+    };
   }
 }

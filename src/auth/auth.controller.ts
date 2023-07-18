@@ -14,6 +14,9 @@ import { Public } from './decorator/public.decorator';
 import { LoginDto, RegisterDto } from './dtos/auth.dto';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { RefreshTokenGuard } from './guard/jwt-refresh.guard';
+import { GetUser } from './decorator/get-user.decorator';
+import { IDataThirdParty } from './interfaces/auth.interface';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -23,14 +26,15 @@ export class AuthController {
   @ApiOperation({ summary: 'Đăng nhập và hệ thống' })
   @Public()
   @Post('login')
-  //   @UseInterceptors(ResponseLoginInterceptor)
+  // @UseInterceptors(ResponseLoginInterceptor)
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const data = await this.authService.login(dto);
-    res.cookie('auth-cookie', data.refreshToken, { httpOnly: true });
-    return data;
+    const { refreshToken, ...resp } = data;
+    res.cookie('auth-cookie', refreshToken, { httpOnly: true });
+    return resp;
   }
 
   @ApiOperation({ summary: 'Đăng kí tài khoản' })
@@ -40,9 +44,32 @@ export class AuthController {
     return this.authService.register(dto);
   }
 
+  @ApiOperation({ summary: 'refreshToken' })
+  @UseGuards(RefreshTokenGuard)
+  @Post('refresh-token')
+  async refreshToken(
+    @GetUser('id') userId: number,
+    @GetUser('refreshToken') refreshToken: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = await this.authService.refreshTokens(userId, refreshToken);
+    res.cookie('auth-cookie', token.refreshToken, { httpOnly: true });
+    return { accessToken: token.accessToken };
+  }
+
+  @ApiOperation({ summary: 'logout' })
+  @Post('logout')
+  async logout(
+    @GetUser('id') userId: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.cookie('auth-cookie', '', { maxAge: -1 });
+    return this.authService.logout(userId);
+  }
+
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req) {}
+  async googleAuth(@Req() req: Request) {}
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
@@ -52,11 +79,12 @@ export class AuthController {
 
   @Get('facebook')
   @UseGuards(AuthGuard('facebook'))
-  async facebookAuth(@Req() req) {}
+  async facebookAuth(@Req() req: Request) {}
 
   @Get('facebook/redirect')
   @UseGuards(AuthGuard('facebook'))
   facebookAuthRedirect(@Req() req: Request) {
-    return this.authService.thirdPartyLogin(req.user);
+    const user = req.user;
+    return this.authService.thirdPartyLogin(user);
   }
 }

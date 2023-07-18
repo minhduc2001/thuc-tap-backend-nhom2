@@ -10,4 +10,5 @@ export const dbConfig: TypeOrmModuleOptions = {
   database: config.DB_DATABASE,
   entities: ['dist/**/*.entity{.ts,.js}'],
   synchronize: true,
+  migrations: ['src/shared/migrations/*.ts'],
 };

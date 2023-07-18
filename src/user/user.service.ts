@@ -81,38 +81,19 @@ export class UserService extends BaseService<User> {
     console.log(dto);
   }
 
-  async checkPhoneNumberExists(phone: string) {
-    try {
-      const isExist = await this.getUserByUniqueKey({ phone: phone });
-      if (isExist)
-        throw new exc.BadRequest({
-          message: 'Số điện thoại đã tồn tại',
-          errorCode: 'PHONE_EXIST',
-        });
-      return;
-    } catch (e) {
-      // this.logger.warn(e);
-      throw new exc.BadRequest({
-        message: e.message,
-        errorCode: e.response.errorCode,
-      });
-    }
-  }
-
-  async countDeviceLogged(userId) {}
-
   public async validRefreshToken(userId: number, refreshToken: string) {
-    console.log(userId, refreshToken);
     const user = await this.repository.findOne({
       where: {
         id: userId,
-        refreshToken: refreshToken,
       },
     });
 
-    if (!user) {
-      return null;
-    }
+    if (!user) return null;
+
+    const compare = user.compareRefreshToken(refreshToken);
+
+    if (!compare)
+      throw new exc.Forbidden({ message: 'refresh token is not valid' });
 
     return user;
   }

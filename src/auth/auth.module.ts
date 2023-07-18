@@ -20,7 +20,7 @@ import { RtStrategy } from '@/auth/strategies/rt.strategy';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: config.JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '1s' },
     }),
   ],
   providers: [

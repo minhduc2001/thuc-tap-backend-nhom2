@@ -7,6 +7,14 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { NotificationModule } from './notification/notification.module';
 import { AudioBookModule } from './audio-book/audio-book.module';
+import { AuthorModule } from './author/author.module';
+import { PackageModule } from './package/package.module';
+import { PaymentModule } from './payment/payment.module';
+import { GenreModule } from './genre/genre.module';
+import { HistoryModule } from './history/history.module';
+import { LibraryModule } from './library/library.module';
+import { HomeModule } from './home/home.module';
+import { SystemConfigurationModule } from './system-configuration/system-configuration.module';
 
 const baseModules = [ConfigModule, LoggerModule];
 const appModules = [AuthModule, UserModule, AudioBookModule];

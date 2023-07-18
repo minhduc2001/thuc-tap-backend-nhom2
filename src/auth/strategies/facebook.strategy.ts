@@ -2,6 +2,7 @@ import { config } from '@/base/config';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-facebook';
+import { IDataThirdParty } from '../interfaces/auth.interface';
 // import { AuthService } from './auth.service';
 
 @Injectable()
@@ -21,8 +22,8 @@ export class FacebookStrategy extends PassportStrategy(Strategy, 'facebook') {
     profile: any,
     done: Function,
   ): Promise<any> {
-    console.log(profile);
-    const user = {
+    const user: IDataThirdParty = {
+      id: profile.id,
       username: profile.displayName,
       provider: 'facebook',
     };

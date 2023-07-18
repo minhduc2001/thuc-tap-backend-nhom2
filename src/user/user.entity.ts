@@ -14,14 +14,14 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   username: string;
 
-  @Column({ nullable: false, unique: true })
+  @Column({ nullable: true, unique: true })
   phone: string;
 
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   @Column()
   password: string;
 
-  @Column({ nullable: true, unique: true })
+  @Column({ nullable: false, unique: true })
   email: string;
 
   @Column({ nullable: true })
@@ -37,11 +37,11 @@ export class User extends AbstractEntity {
   @JoinTable()
   permissions: Permission[];
 
-  @Column({ nullable: true, default: null })
-  packageId: number;
+  // @Column({ nullable: true, default: null })
+  // packageId: number;
 
-  @Column({ type: 'bigint', nullable: true, default: null })
-  packageExpire: string;
+  // @Column({ type: 'bigint', nullable: true, default: null })
+  // packageExpire: string;
 
   @Column({ type: 'enum', enum: EState, default: EState.Active })
   state: EState;
@@ -52,6 +52,12 @@ export class User extends AbstractEntity {
   @Exclude({ toPlainOnly: true })
   @Column({ nullable: true, default: null })
   refreshToken: string;
+
+  @Column({ type: 'boolean', default: false })
+  verified: boolean;
+
+  @Column({ default: 'local' })
+  provider: string;
 
   setPassword(password: string) {
     this.password = bcrypt.hashSync(password, 10);
@@ -68,6 +74,6 @@ export class User extends AbstractEntity {
 
   compareRefreshToken(rawRefreshToken: string): boolean {
     const refreshToken = this.refreshToken;
-    return bcrypt.compareSync(rawRefreshToken, rawRefreshToken);
+    return bcrypt.compareSync(rawRefreshToken, refreshToken);
   }
 }

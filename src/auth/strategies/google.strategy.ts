@@ -3,6 +3,7 @@ import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { config } from '@/config';
 
 import { Injectable } from '@nestjs/common';
+import { IDataThirdParty } from '../interfaces/auth.interface';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -22,12 +23,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ): Promise<any> {
     const { name, emails, photos } = profile;
-    const user = {
+    const user: IDataThirdParty = {
       provider: 'google',
       email: emails[0].value,
       username: name.givenName + name.familyName,
       picture: photos[0].value,
-      accessToken,
     };
     return user;
   }
