@@ -1,42 +1,52 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
-import { PackageService } from './package.service';
-import { CreatePackageDto } from './dto/create-package.dto';
-import { UpdatePackageDto } from './dto/update-package.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { Public } from '@/auth/decorator/public.decorator';
+import { PackageService } from '@/package/package.service';
+import {
+  CreatePackageDto,
+  ListPackageDto,
+  UpdatePackageDto,
+} from '@/package/package.dto';
+import { Roles } from '@/role/roles.decorator';
+import { ERole } from '@/role/enum/roles.enum';
+import { BulkIdsDto, ParamIdDto } from '@shared/dtos/common.dto';
 
+@ApiTags('Package')
 @Controller('package')
 export class PackageController {
-  constructor(private readonly packageService: PackageService) {}
+  constructor(private readonly service: PackageService) {}
 
+  @Public()
+  @Roles(ERole.Admin)
   @Post()
-  create(@Body() createPackageDto: CreatePackageDto) {
-    return this.packageService.create(createPackageDto);
+  async createPackage(@Body() dto: CreatePackageDto) {
+    return this.service.createPackage(dto);
   }
 
   @Get()
-  findAll() {
-    return this.packageService.findAll();
+  async listPackage(@Query() query: ListPackageDto) {
+    return this.service.listPackage(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.packageService.findOne(+id);
+  @Put(':id')
+  async updatePackage(
+    @Param() param: ParamIdDto,
+    @Body() dto: UpdatePackageDto,
+  ) {
+    return this.service.updatePackage({ ...param, ...dto });
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePackageDto: UpdatePackageDto) {
-    return this.packageService.update(+id, updatePackageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.packageService.remove(+id);
+  @Delete()
+  async bulkDeletePackage(@Body() dto: BulkIdsDto) {
+    return this.service.bulkDeletePackage(dto.ids);
   }
 }

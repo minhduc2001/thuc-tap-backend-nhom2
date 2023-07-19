@@ -8,6 +8,9 @@ import { AbstractEntity } from '@base/service/abstract-entity.service';
 import { ERole } from '@/role/enum/roles.enum';
 import { Permission } from '@/role/entities/permission.entity';
 import { EState } from '@shared/enum/common.enum';
+import { Payment } from '@/payment/entities/payment.entity';
+import { Library } from '@/library/entities/library.entity';
+import { History } from '@/history/entities/history.entity';
 
 @Entity()
 export class User extends AbstractEntity {
@@ -46,10 +49,7 @@ export class User extends AbstractEntity {
   @Column({ type: 'enum', enum: EState, default: EState.Active })
   state: EState;
 
-  @Column({ type: 'bigint', nullable: true })
-  uav: number;
-
-  @Exclude({ toPlainOnly: true })
+  @Exclude()
   @Column({ nullable: true, default: null })
   refreshToken: string;
 
@@ -58,6 +58,24 @@ export class User extends AbstractEntity {
 
   @Column({ default: 'local' })
   provider: string;
+
+  @OneToMany(() => Payment, (payment) => payment.user)
+  @JoinColumn()
+  payments: Payment[];
+
+  @OneToMany(() => History, (history) => history.user)
+  @JoinColumn()
+  history: History[];
+
+  @OneToMany(() => Library, (library) => library.user)
+  @JoinColumn()
+  library: Library[];
+
+  @Column({ nullable: true, default: null })
+  packageId: number;
+
+  @Column({ type: 'bigint', nullable: true, default: null })
+  packageExpire: string;
 
   setPassword(password: string) {
     this.password = bcrypt.hashSync(password, 10);

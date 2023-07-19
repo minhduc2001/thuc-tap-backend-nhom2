@@ -1,42 +1,38 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
-import { GenreService } from './genre.service';
-import { CreateGenreDto } from './dto/create-genre.dto';
-import { UpdateGenreDto } from './dto/update-genre.dto';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+// BASE
+import { LoggerService } from '@base/logger';
+
+// APPS
+import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
+import { GenreService } from '@/genre/genre.service';
+import { ListGenreDto } from '@/genre/genre.dto';
+
+// SHARED
+import { ParamIdDto } from '@shared/dtos/common.dto';
 
 @Controller('genre')
+@ApiTags('Genre')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class GenreController {
-  constructor(private readonly genreService: GenreService) {}
+  constructor(
+    private readonly service: GenreService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
-  @Post()
-  create(@Body() createGenreDto: CreateGenreDto) {
-    return this.genreService.create(createGenreDto);
-  }
+  logger = this.loggerService.getLogger(GenreController.name);
 
+  @ApiOperation({ summary: 'Lấy danh sách thể loại' })
   @Get()
-  findAll() {
-    return this.genreService.findAll();
+  async listGenre(@Query() query: ListGenreDto) {
+    return this.service.listGenre(query);
   }
 
+  @ApiOperation({ summary: 'Lấy ra 1 thể loại' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.genreService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGenreDto: UpdateGenreDto) {
-    return this.genreService.update(+id, updateGenreDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.genreService.remove(+id);
+  async getGenre(@Param() param: ParamIdDto) {
+    return this.service.getGenre(param.id);
   }
 }

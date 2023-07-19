@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { CreateGenreDto } from './dto/create-genre.dto';
-import { UpdateGenreDto } from './dto/update-genre.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+// BASE
+import { BaseService } from '@base/service/base.service';
+import { LoggerService } from '@base/logger';
+import * as exc from '@base/api/exception.reslover';
+import { PaginateConfig } from '@base/service/paginate';
+
+// APPS
+import { Genre } from '@/genre/entities/genre.entity';
+import { ListGenreDto } from '@/genre/genre.dto';
 
 @Injectable()
-export class GenreService {
-  create(createGenreDto: CreateGenreDto) {
-    return 'This action adds a new genre';
+export class GenreService extends BaseService<Genre> {
+  constructor(
+    @InjectRepository(Genre)
+    protected readonly repository: Repository<Genre>,
+    private readonly loggerService: LoggerService,
+  ) {
+    super(repository);
   }
 
-  findAll() {
-    return `This action returns all genre`;
+  private logger = this.loggerService.getLogger(GenreService.name);
+
+  async listGenre(query: ListGenreDto) {
+    const config: PaginateConfig<Genre> = {
+      sortableColumns: ['id'],
+    };
+
+    return this.listWithPage(query, config);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} genre`;
-  }
-
-  update(id: number, updateGenreDto: UpdateGenreDto) {
-    return `This action updates a #${id} genre`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} genre`;
+  async getGenre(id: number) {
+    const genre = await this.repository.findOne({ where: { id: id } });
+    if (!genre) throw new exc.BadRequest({ message: 'genre không tồn tại' });
+    return genre;
   }
 }

@@ -15,11 +15,28 @@ import { HistoryModule } from './history/history.module';
 import { LibraryModule } from './library/library.module';
 import { HomeModule } from './home/home.module';
 import { SystemConfigurationModule } from './system-configuration/system-configuration.module';
+import { CommentModule } from './comment/comment.module';
+import { HelperModule } from './base/helper/helper.module';
 
-const baseModules = [ConfigModule, LoggerModule];
-const appModules = [AuthModule, UserModule, AudioBookModule];
+const baseModules = [ConfigModule, LoggerModule, HelperModule];
+const appModules = [
+  AuthModule,
+  UserModule,
+  AudioBookModule,
+  AuthorModule,
+  GenreModule,
+  CommentModule,
+  LibraryModule,
+  HistoryModule,
+  SystemConfigurationModule,
+];
 @Module({
-  imports: [...baseModules, ...appModules, TypeOrmModule.forRoot(dbConfig)],
+  imports: [
+    ...baseModules,
+    ...appModules,
+    TypeOrmModule.forRoot(dbConfig),
+    CommentModule,
+  ],
   controllers: [],
   providers: [],
 })

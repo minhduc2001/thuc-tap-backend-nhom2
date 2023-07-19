@@ -1,12 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { AbstractEntity } from '@base/service/abstract-entity.service';
+import { AudioBook } from '@/audio-book/entities/audio-book.entity';
 
 @Entity()
-export class Genre {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @ApiProperty()
+export class Genre extends AbstractEntity {
   @Column()
   name: string;
+
+  @OneToMany(() => AudioBook, (audioBook) => audioBook.genre)
+  audioBook: AudioBook[];
 }

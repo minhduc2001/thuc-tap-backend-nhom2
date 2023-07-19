@@ -94,7 +94,6 @@ export class AuthService {
   async logout(userId: number) {
     const user = await this.userService.getUser(userId);
     user.refreshToken = '';
-    user.uav = new Date().getTime();
     await user.save();
   }
 

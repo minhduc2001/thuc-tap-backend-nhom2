@@ -1,26 +1,64 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePackageDto } from './dto/create-package.dto';
-import { UpdatePackageDto } from './dto/update-package.dto';
+import { LoggerService } from '@base/logger';
+import { BaseService } from '@base/service/base.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import * as exc from '@base/api/exception.reslover';
+import { Package } from '@/package/entities/package.entity';
+import { PaginateConfig } from '@base/service/paginate';
+import {
+  CreatePackageDto,
+  ListPackageDto,
+  UpdatePackageDto,
+} from '@/package/package.dto';
 
 @Injectable()
-export class PackageService {
-  create(createPackageDto: CreatePackageDto) {
-    return 'This action adds a new package';
+export class PackageService extends BaseService<Package> {
+  constructor(
+    @InjectRepository(Package)
+    protected readonly repository: Repository<Package>,
+    private readonly loggerService: LoggerService,
+  ) {
+    super(repository);
+  }
+  private logger = this.loggerService.getLogger(PackageService.name);
+
+  async getPackage(id: number) {
+    const isExist = await this.repository.findOne({ where: { id: id } });
+    if (!isExist) throw new exc.BadRequest({ message: 'Gói không tồn tại' });
+    return isExist;
   }
 
-  findAll() {
-    return `This action returns all package`;
+  async listPackage(query: ListPackageDto) {
+    const config: PaginateConfig<Package> = {
+      sortableColumns: ['createdAt', 'expire'],
+    };
+    return this.listWithPage(query, config);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} package`;
+  async createPackage(dto: CreatePackageDto) {
+    return this.repository.save(dto);
   }
 
-  update(id: number, updatePackageDto: UpdatePackageDto) {
-    return `This action updates a #${id} package`;
+  async updatePackage(dto: UpdatePackageDto) {
+    return this.repository.update(dto.id, dto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} package`;
+  async bulkDeletePackage(ids: number[]) {
+    try {
+      for (const id of ids) {
+        await this._checkDependency(id);
+        await this.repository.delete(id);
+      }
+    } catch (e) {
+      this.logger.warn(e);
+      throw new exc.BadRequest({ message: e.message });
+    }
+  }
+
+  // Private
+
+  private async _checkDependency(id: number) {
+    return;
   }
 }

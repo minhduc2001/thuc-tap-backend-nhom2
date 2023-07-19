@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthorDto } from './dto/create-author.dto';
-import { UpdateAuthorDto } from './dto/update-author.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+// BASE
+import { BaseService } from '@base/service/base.service';
+import { LoggerService } from '@base/logger';
+import * as exc from '@base/api/exception.reslover';
+import { PaginateConfig } from '@base/service/paginate';
+
+// APPS
+import { Author } from '@/author/entities/author.entity';
+import { ListAuthorDto } from '@/author/author.dto';
 
 @Injectable()
-export class AuthorService {
-  create(createAuthorDto: CreateAuthorDto) {
-    return 'This action adds a new author';
+export class AuthorService extends BaseService<Author> {
+  constructor(
+    @InjectRepository(Author)
+    protected readonly repository: Repository<Author>,
+    private readonly loggerService: LoggerService,
+  ) {
+    super(repository);
   }
 
-  findAll() {
-    return `This action returns all author`;
+  private logger = this.loggerService.getLogger(AuthorService.name);
+
+  async listAuthor(query: ListAuthorDto) {
+    const config: PaginateConfig<Author> = {
+      sortableColumns: ['id'],
+    };
+
+    return this.listWithPage(query, config);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} author`;
-  }
-
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} author`;
+  async getAuthor(id: number) {
+    const author = await this.repository.findOne({ where: { id: id } });
+    if (!author) throw new exc.BadRequest({ message: 'author không tồn tại' });
+    return author;
   }
 }

@@ -1,49 +1,121 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
+  Post,
+  Put,
+  Query,
+  UploadedFile,
+  UploadedFiles,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { AudioBookService } from './audio-book.service';
-import { CreateAudioBookDto } from './dto/create-audio-book.dto';
-import { UpdateAudioBookDto } from './dto/update-audio-book.dto';
-import * as path from 'path';
+import {
+  ApiBearerAuth,
+  ApiConsumes,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+
+// BASE
+import { LoggerService } from '@base/logger';
+import * as exc from '@base/api/exception.reslover';
+import { FileService } from '@base/helper/file.service';
+
+import { checkFile, checkFiles } from '@shared/validator/type-file.validator';
+import { ParamIdDto } from '@shared/dtos/common.dto';
+
+// APPS
+import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
+import { AudioBookService } from '@/audio-book/audio-book.service';
+import {
+  CreateAudioBookDto,
+  ListAudioBookDto,
+  UpdateAudioBookDto,
+} from '@/audio-book/audio-book.dto';
+import { Roles } from '@/role/roles.decorator';
+import { ERole } from '@/role/enum/roles.enum';
+import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { User } from '@/user/user.entity';
 
 @Controller('audio-book')
+@ApiTags('Audio Book')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class AudioBookController {
-  constructor(private readonly audioBookService: AudioBookService) {}
+  constructor(
+    private readonly service: AudioBookService,
+    private readonly fileService: FileService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
-  @Post()
-  create(@Body() createAudioBookDto: CreateAudioBookDto) {
-    return this.audioBookService.create(createAudioBookDto);
-  }
+  private logger = this.loggerService.getLogger(AudioBookController.name);
 
+  @ApiOperation({ summary: 'lấy danh sách audio book' })
   @Get()
-  findAll() {
-    // return this.audioBookService.findAll();
-    return this.audioBookService.encodeHLSWithMultipleAudioStreams(
-      path.join(process.cwd(), 'audio', 'nhac1.mp3'),
-    );
+  async listAudioBook(@Query() query: ListAudioBookDto) {
+    return this.service.listAudioBook(query);
   }
 
+  @ApiOperation({ summary: 'Lấy chi tiết audio book' })
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.audioBookService.findOne(+id);
+  async getAudioBook(@Param() param: ParamIdDto) {
+    return;
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateAudioBookDto: UpdateAudioBookDto,
+  @ApiOperation({ summary: 'Tạo audio book' })
+  @Post()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  // @Roles(ERole.Admin)
+  async createAudioBook(
+    @Body() dto: CreateAudioBookDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.audioBookService.update(+id, updateAudioBookDto);
+    try {
+      const fileName = checkFile(file);
+      return this.service.createAudioBook({
+        ...dto,
+        file: fileName,
+      });
+    } catch (e) {
+      this.logger.warn(e.message);
+      this.fileService.removeFile(file.filename);
+      throw new exc.BadRequest({ message: e.message });
+    }
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.audioBookService.remove(+id);
+  @ApiOperation({ summary: 'yêu thích' })
+  @Post('like')
+  async like(@Body() dto: ParamIdDto, @GetUser() user: User) {
+    return this.service.like(dto.id, user);
+  }
+
+  @ApiOperation({ summary: 'sửa audio book' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @Roles(ERole.Admin)
+  @Put(':id')
+  async updateAudioBook(
+    @Body() dto: UpdateAudioBookDto,
+    @Param() param: ParamIdDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    try {
+      const fileName = checkFile(file);
+      return this.service.updateAudioBook({
+        ...dto,
+        ...param,
+        file: fileName,
+      });
+    } catch (e) {
+      this.logger.warn(e.message);
+
+      this.fileService.removeFile(file.filename);
+
+      throw new exc.BadRequest({ message: e.message });
+    }
   }
 }
