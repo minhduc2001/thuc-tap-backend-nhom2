@@ -8,14 +8,14 @@ import { RoleController } from './role.controller';
 @Module({
   providers: [
     RoleService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: PermissionGuard,
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: RolesGuard,
+    // },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: PermissionGuard,
+    // },
   ],
   controllers: [RoleController],
 })

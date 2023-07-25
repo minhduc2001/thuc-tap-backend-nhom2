@@ -27,7 +27,7 @@ import { RtStrategy } from '@/auth/strategies/rt.strategy';
     AuthService,
     JwtStrategy,
     RtStrategy,
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    // { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   controllers: [AuthController],
 })

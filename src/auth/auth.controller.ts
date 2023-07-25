@@ -51,6 +51,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'refreshToken' })
   @UseGuards(RefreshTokenGuard)
+  @Public()
   @Post('refresh-token')
   async refreshToken(
     @GetUser('id') userId: number,

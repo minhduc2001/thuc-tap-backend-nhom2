@@ -46,6 +46,7 @@ import { Roles } from '@/role/roles.decorator';
 import { ERole } from '@/role/enum/roles.enum';
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { User } from '@/user/user.entity';
+import { RolesGuard } from '@/role/roles.guard';
 
 @Controller('audio-book')
 @ApiTags('Audio Book')
@@ -81,6 +82,7 @@ export class AudioBookController {
       { name: 'image', maxCount: 1 },
     ]),
   )
+  @UseGuards(RolesGuard)
   @Roles(ERole.Admin)
   async createAudioBook(
     @Body() dto: CreateAudioBookDto,
@@ -116,6 +118,7 @@ export class AudioBookController {
     ]),
   )
   @Put(':id')
+  @UseGuards(RolesGuard)
   @Roles(ERole.Admin)
   async updateAudioBook(
     @Body() dto: UpdateAudioBookDto,
