@@ -51,6 +51,7 @@ export class ConfigService {
   // file
   MAX_FILE_SIZE = 10000000; // 10MB;
   UPLOAD_LOCATION = 'uploads';
+  UPLOAD_LOCATION_AUDIO = 'audio';
 
   // Momo
   PARTNER_CODE = _process.env.PARTNER_CODE;

@@ -15,6 +15,7 @@ import {
   IUserGetByUniqueKey,
 } from '@/user/interfaces/user.interface';
 import { ListUserDto, UploadAvatarDto } from '@/user/dtos/user.dto';
+import { LibraryService } from '@/library/services/library.service';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -22,6 +23,7 @@ export class UserService extends BaseService<User> {
     @InjectRepository(User)
     protected readonly repository: Repository<User>,
     private readonly loggerService: LoggerService,
+    private readonly libraryService: LibraryService,
   ) {
     super(repository);
   }
@@ -59,6 +61,11 @@ export class UserService extends BaseService<User> {
     try {
       const user: User = this.repository.create(data);
       user.setPassword(data.password);
+      const lib = await this.libraryService.createLibrary({
+        name: 'Yêu thích',
+        user: user,
+      });
+      user.library = [lib];
       await user.save();
 
       return;

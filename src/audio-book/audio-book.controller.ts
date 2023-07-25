@@ -17,14 +17,21 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 
 // BASE
 import { LoggerService } from '@base/logger';
 import * as exc from '@base/api/exception.reslover';
 import { FileService } from '@base/helper/file.service';
 
-import { checkFile, checkFiles } from '@shared/validator/type-file.validator';
+import {
+  checkFileImage,
+  checkFilesImage,
+} from '@shared/validator/type-file.validator';
 import { ParamIdDto } from '@shared/dtos/common.dto';
 
 // APPS
@@ -62,27 +69,34 @@ export class AudioBookController {
   @ApiOperation({ summary: 'Lấy chi tiết audio book' })
   @Get(':id')
   async getAudioBook(@Param() param: ParamIdDto) {
-    return;
+    return this.service.getAudioBook(param.id);
   }
 
   @ApiOperation({ summary: 'Tạo audio book' })
   @Post()
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
-  // @Roles(ERole.Admin)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'audio', maxCount: 1 },
+      { name: 'image', maxCount: 1 },
+    ]),
+  )
+  @Roles(ERole.Admin)
   async createAudioBook(
     @Body() dto: CreateAudioBookDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles()
+    files: { image?: Express.Multer.File; audio?: Express.Multer.File },
   ) {
     try {
-      const fileName = checkFile(file);
       return this.service.createAudioBook({
         ...dto,
-        file: fileName,
+        audio: files?.audio[0]?.filename,
+        image: files?.image[0]?.filename,
       });
     } catch (e) {
       this.logger.warn(e.message);
-      this.fileService.removeFile(file.filename);
+      this.fileService.removeFile(files.audio[0].filename, 'audio');
+      this.fileService.removeFile(files.image[0].filename, 'uploads');
       throw new exc.BadRequest({ message: e.message });
     }
   }
@@ -95,25 +109,32 @@ export class AudioBookController {
 
   @ApiOperation({ summary: 'sửa audio book' })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
-  @Roles(ERole.Admin)
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'audio', maxCount: 1 },
+      { name: 'image', maxCount: 1 },
+    ]),
+  )
   @Put(':id')
+  @Roles(ERole.Admin)
   async updateAudioBook(
     @Body() dto: UpdateAudioBookDto,
     @Param() param: ParamIdDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles()
+    files: { image?: Express.Multer.File; audio?: Express.Multer.File },
   ) {
     try {
-      const fileName = checkFile(file);
       return this.service.updateAudioBook({
         ...dto,
         ...param,
-        file: fileName,
+        audio: files?.audio?.[0]?.filename,
+        image: files?.image?.[0]?.filename,
       });
     } catch (e) {
       this.logger.warn(e.message);
 
-      this.fileService.removeFile(file.filename);
+      this.fileService.removeFile(files.audio[0].filename, 'audio');
+      this.fileService.removeFile(files.image[0].filename, 'uploads');
 
       throw new exc.BadRequest({ message: e.message });
     }

@@ -20,44 +20,44 @@ export class AudioBook extends AbstractEntity {
   title: string;
 
   @Column({ nullable: true, default: null })
-  publicationDate: Date;
+  publishDate: number;
 
   @Column({ nullable: true, default: 0 })
-  views: number;
+  views?: number;
 
   @Column({ nullable: true, default: 0 })
-  likes: number;
-
-  @Column({ nullable: true, default: 0 })
-  followers: number;
+  likes?: number;
 
   @Column({ nullable: true, default: '' })
-  description: string;
-
-  @Column({ type: 'boolean', default: false })
-  accomplished: boolean;
+  desc: string;
 
   @Column({ default: '', nullable: true })
   image: string;
 
+  @Column({ nullable: true })
+  url?: string;
+
+  @Column({ nullable: true })
+  duration?: number;
+
   @ManyToOne(() => Genre, (genre) => genre.audioBook)
   @JoinColumn()
-  genre: Genre;
+  genre?: Genre;
 
   @ManyToMany(() => Author, (author) => author.audioBook)
   @JoinTable()
-  author: Author[];
+  author?: Author[];
 
   @OneToMany(() => Comment, (comment) => comment.audioBook)
-  comment: Comment;
+  comment?: Comment[];
 
   @OneToMany(() => History, (history) => history.user)
   @JoinColumn()
-  history: History[];
+  history?: History[];
 
   @OneToMany(
     () => AudioBookLibrary,
     (audioBookLibrary) => audioBookLibrary.audioBook,
   )
-  audioBookLibrary: AudioBookLibrary[];
+  audioBookLibrary?: AudioBookLibrary[];
 }

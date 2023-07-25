@@ -19,7 +19,7 @@ export class ResponseTransformInterceptor<T>
   ): Observable<Payload<T>> {
     return next.handle().pipe(
       map((data) =>
-        data?.meta
+        data?.data?.meta
           ? {
               ...defaultPayload,
               data: data.data,

@@ -46,12 +46,14 @@ export class CommentService extends BaseService<Comment> {
       user = await this.userService.getUserById(dto.reply);
     }
 
+    console.log(dto.user);
+
     return this.repository.save({
       content: dto.content,
       audioBook: audioBook,
       author: dto.user,
       reply: user,
-      parentCommentId: dto.parentCommentId,
+      parentCommentId: dto.parentCommentId ?? null,
     });
   }
 

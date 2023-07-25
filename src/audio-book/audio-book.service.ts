@@ -20,6 +20,8 @@ import {
 import { AudioBookLibrary } from '@/library/entities/audio-book-library.entity';
 import { Library } from '@/library/entities/library.entity';
 import { User } from '@/user/user.entity';
+import { UrlService } from '@/base/helper/url.service';
+import { FileService } from '@/base/helper/file.service';
 
 const MAXIMUM_BITRATE_128K = 128 * 10 ** 3; // 128 Kbps
 const MAXIMUM_BITRATE_256K = 256 * 10 ** 3; // 256 Kbps
@@ -36,24 +38,48 @@ export class AudioBookService extends BaseService<AudioBook> {
     private readonly genreService: GenreService,
     private dataSource: DataSource,
     private readonly loggerService: LoggerService,
+    private readonly urlService: UrlService,
+    private readonly fileService: FileService,
   ) {
     super(repository);
   }
 
   logger = this.loggerService.getLogger(AudioBookService.name);
 
+  async preResponse(audioBooks: AudioBook[]) {
+    for (const audioBook of audioBooks) {
+      if (audioBook.url) audioBook.url = this.urlService.dataUrl(audioBook.url);
+      if (audioBook?.image)
+        audioBook.image = this.urlService.uploadUrl(audioBook.image);
+    }
+  }
+
   async listAudioBook(query: ListAudioBookDto) {
     const config: PaginateConfig<AudioBook> = {
       sortableColumns: ['updatedAt'],
+      defaultSortBy: [['updatedAt', 'DESC']],
+      searchableColumns: ['title'],
       relations: ['author', 'genre'],
     };
-    return this.listWithPage(query, config);
+    const data = await this.listWithPage(query, config);
+    await this.preResponse(data.results);
+    return data;
   }
 
   async getAudioBook(id: number) {
     const audioBook = await this.repository.findOne({ where: { id: id } });
     if (!audioBook)
       throw new exc.BadRequest({ message: 'Không tồn tại audio book' });
+    await this.preResponse([audioBook]);
+    return audioBook;
+  }
+
+  async getAudioBookWithoutImage(id: number) {
+    const audioBook = await this.repository.findOne({
+      where: { id: id },
+    });
+    if (!audioBook) throw new exc.BadRequest({ message: 'ko co bai nay' });
+
     return audioBook;
   }
 
@@ -62,15 +88,26 @@ export class AudioBookService extends BaseService<AudioBook> {
       const authors = await this._findAuthor(dto.author);
       const genre = await this._findGenre(dto.genre);
 
-      return await this.repository.save({
+      let url = null;
+      if (dto.audio) {
+        url = (await this.encodeHLSWithMultipleAudioStreams(dto.audio)).split(
+          '/',
+        );
+        this.fileService.removeFile(dto.audio, 'audio');
+      }
+
+      await this.repository.save({
         author: authors,
         genre: genre,
         title: dto.title,
-        accomplished: dto.accomplished,
-        description: dto.description,
-        publicationDate: dto.publicationDate,
-        image: dto.file,
+        desc: dto.desc,
+        publishDate: dto.publishDate,
+        image: dto.image,
+        url: url?.at(-1),
+        duration: dto.duration,
       });
+
+      return true;
     } catch (e) {
       this.logger.warn(e);
       throw new exc.BadRequest({ message: e.message });
@@ -78,25 +115,33 @@ export class AudioBookService extends BaseService<AudioBook> {
   }
 
   async updateAudioBook(dto: UpdateAudioBookDto) {
-    const audioBook = await this.getAudioBook(dto.id);
+    const audioBook = await this.getAudioBookWithoutImage(dto.id);
 
-    const authors = await this._findAuthor(dto.author);
-    const genres = await this._findGenre(dto.genre);
+    let authors = null;
+    let genre = null;
+    if (dto?.author?.length > 0) {
+      authors = await this._findAuthor(dto.author);
+    }
+
+    if (dto.genre) genre = await this._findGenre(dto.genre);
 
     if (dto.title) {
       audioBook.title = dto.title;
     }
 
-    audioBook.author = authors;
-    audioBook.genre = genres;
-    await audioBook.save();
+    if (dto.audio) {
+      this.fileService.removeFile(audioBook.url, 'audio');
+      const url = (
+        await this.encodeHLSWithMultipleAudioStreams(dto.audio)
+      ).split('/');
+      audioBook.url = url[2];
+      this.fileService.removeFile(dto.audio, 'audio');
+    }
 
-    await this.repository.update(dto.id, {
-      accomplished: dto.accomplished,
-      description: dto.description,
-      publicationDate: dto.publicationDate,
-      image: dto.file,
-    });
+    audioBook.author = authors?.length > 0 ? authors : audioBook.author;
+    audioBook.genre = genre ?? audioBook.genre;
+    audioBook.image = dto.image ?? audioBook.image;
+    await audioBook.save();
     return true;
   }
 
@@ -156,9 +201,10 @@ export class AudioBookService extends BaseService<AudioBook> {
   }
 
   public async encodeHLSWithMultipleAudioStreams(
-    inputPath: string,
-  ): Promise<boolean> {
+    audioName: string,
+  ): Promise<string> {
     try {
+      const inputPath = path.join('audio', audioName);
       const bitrate = await this.getBitrate(inputPath);
       const parentFolder = path.join(inputPath, '..');
       const songName = inputPath.split('/').at(-1).split('.')[0];
@@ -230,13 +276,13 @@ export class AudioBookService extends BaseService<AudioBook> {
         `;
       }
 
-      return new Promise<boolean>((resolve, reject) => {
+      return new Promise<string>((resolve, reject) => {
         exec(command, (err, stdout, stderr) => {
           if (err) {
             reject(err);
           } else {
             console.log('Convert thành công');
-            resolve(true);
+            resolve(outputPath);
           }
         });
       });

@@ -18,11 +18,21 @@ import { SystemConfigurationModule } from './system-configuration/system-configu
 import { CommentModule } from './comment/comment.module';
 import { HelperModule } from './base/helper/helper.module';
 import { MailerModule } from './mailer/mailer.module';
+import { SeedersModule } from './shared/seeder/seeder.module';
+import { UploadFileModule } from './base/multer/multer.module';
+import { RoleModule } from './role/role.module';
 
-const baseModules = [ConfigModule, LoggerModule, HelperModule];
+const baseModules = [
+  ConfigModule,
+  LoggerModule,
+  HelperModule,
+  UploadFileModule,
+  SeedersModule,
+];
 const appModules = [
   AuthModule,
   UserModule,
+  RoleModule,
   AudioBookModule,
   AuthorModule,
   GenreModule,

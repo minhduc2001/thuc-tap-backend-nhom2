@@ -12,6 +12,14 @@ export class UrlService {
   private logger = this.loggerService.getLogger(UrlService.name);
 
   uploadUrl(filename: string): string {
-    return `${config.IP}:${config.PORT}/api/v${config.API_VERSION}/uploads/${filename}`;
+    if (filename.includes('http')) return filename;
+    return `http://${config.IP}:${config.PORT}/uploads/${filename}`;
+  }
+
+  dataUrl(filename: string): string {
+    if (filename.includes('http')) return filename;
+    return `http://${config.IP}:${config.PORT}/audio/${
+      filename.split('.')[0]
+    }/${filename}`;
   }
 }

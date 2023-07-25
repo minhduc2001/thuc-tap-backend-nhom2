@@ -20,6 +20,8 @@ import { ParamIdDto } from '@shared/dtos/common.dto';
 import { CommentService } from '@/comment/comment.service';
 import { CreateCommentDto, ListCommentDto } from '@/comment/comment.dto';
 import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
+import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { User } from '@/user/user.entity';
 
 @Controller('comment')
 @ApiTags('Comment')
@@ -43,8 +45,8 @@ export class CommentController {
 
   @ApiOperation({ summary: 'Tạo comment' })
   @Post()
-  async createComment(@Body() dto: CreateCommentDto) {
-    return this.service.createComment(dto);
+  async createComment(@Body() dto: CreateCommentDto, @GetUser() user: User) {
+    return this.service.createComment({ ...dto, user: user });
   }
 
   @ApiOperation({ summary: 'xóa comment' })

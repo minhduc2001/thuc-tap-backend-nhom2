@@ -15,8 +15,8 @@ export class ListHistoryDto extends ListDto {
 }
 
 export class WriteHistoryDto {
-  @ApiHideProperty()
-  @IsOptional()
+  @ApiProperty()
+  @IsNotEmpty()
   @Transform(({ value }) => value && +value)
   @IsPositive()
   audioBookId: number;

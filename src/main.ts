@@ -17,12 +17,12 @@ async function bootstrap() {
   const loggerService = app.get(LoggerService);
   const logger = loggerService.getLogger();
 
+  app.enableCors();
   app.use(`/uploads`, express.static('uploads'));
   app.use(`/audio`, express.static('audio'));
   app.use(bodyParser.json({ limit: '10mb' }));
   app.use(cookieParser());
   app.use(morgan('dev'));
-  app.enableCors();
 
   app.useGlobalInterceptors(new ResponseTransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter(loggerService));

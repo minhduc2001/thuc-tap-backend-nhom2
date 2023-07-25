@@ -30,11 +30,6 @@ export class CreateCommentDto {
   @IsPositive()
   audioBook: number;
 
-  @ApiProperty({ description: 'id audio book ep' })
-  @IsNotEmpty()
-  @IsPositive()
-  audioBookEp: number;
-
   @ApiProperty({ description: 'id comment cha' })
   @IsOptional()
   @IsPositive()

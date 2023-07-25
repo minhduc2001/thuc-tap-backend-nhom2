@@ -19,7 +19,7 @@ export class NotificationService {
     if (firebase.apps.length === 0) {
       firebase.initializeApp({
         credential: firebase.credential.cert(
-          path.join(__dirname, '..', '..', 'firebase-adminsdk.json'),
+          path.join(process.cwd(), '..', 'firebase-adminsdk.json'),
         ),
       });
     }

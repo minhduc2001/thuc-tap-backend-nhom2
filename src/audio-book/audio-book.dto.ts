@@ -10,6 +10,7 @@ import {
   IsBoolean,
   IsDateString,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
@@ -18,7 +19,27 @@ import { ToNumber, ToNumbers, Trim } from '@base/decorators/common.decorator';
 
 export class ListAudioBookDto extends ListDto {}
 
-export class CreateAudioBookDto {
+export class UploadMusicDto {
+  @ApiProperty({
+    required: false,
+    type: 'string',
+    format: 'binary',
+    description: 'File to upload',
+  })
+  @IsOptional()
+  image: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    description: 'File to upload',
+    required: false,
+  })
+  @IsOptional()
+  audio: string;
+}
+
+export class CreateAudioBookDto extends UploadMusicDto {
   @ApiProperty()
   @IsNotEmpty()
   @Trim()
@@ -27,19 +48,15 @@ export class CreateAudioBookDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsDateString()
-  publicationDate: Date;
+  @IsNumber()
+  @ToNumber()
+  publishDate: number;
 
   @ApiProperty({ required: false })
   @IsString()
   @Trim()
   @IsOptional()
-  description: string;
-
-  @ApiProperty({ required: false })
-  @IsBoolean()
-  @IsOptional()
-  accomplished: boolean;
+  desc: string;
 
   @ApiProperty({ required: false })
   @ToNumber()
@@ -54,18 +71,21 @@ export class CreateAudioBookDto {
   @IsPositive({ each: true })
   author: number[];
 
-  @ApiProperty({
-    type: 'string',
-    format: 'binary',
-    description: 'File to upload',
-    required: false,
-  })
+  @ApiProperty({ required: false })
   @IsOptional()
-  file: string;
+  @IsPositive()
+  @ToNumber()
+  duration: number;
 }
 
-export class UpdateAudioBookDto extends OmitType(CreateAudioBookDto, [
-  'title',
+export class UpdateAudioBookDto extends PickType(CreateAudioBookDto, [
+  'audio',
+  'image',
+  'duration',
+  'author',
+  'genre',
+  'publishDate',
+  'desc',
 ]) {
   @ApiProperty({ required: false })
   @IsOptional()
