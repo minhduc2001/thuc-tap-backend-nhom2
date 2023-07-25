@@ -22,6 +22,7 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '10mb' }));
   app.use(cookieParser());
   app.use(morgan('dev'));
+  app.enableCors();
 
   app.useGlobalInterceptors(new ResponseTransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter(loggerService));

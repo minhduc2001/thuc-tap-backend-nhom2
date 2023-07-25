@@ -1,42 +1,48 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
   Param,
-  Delete,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
-import { HistoryService } from './history.service';
-import { CreateHistoryDto } from './dto/create-history.dto';
-import { UpdateHistoryDto } from './dto/update-history.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+// BASE
+import { LoggerService } from '@base/logger';
+
+// SHARED
+import { ParamIdDto } from '@shared/dtos/common.dto';
+
+// APPS
+import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
+import { HistoryService } from '@/history/history.service';
+import { ListHistoryDto, WriteHistoryDto } from '@/history/history.dto';
+import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { User } from '@/user/user.entity';
 
 @Controller('history')
+@ApiTags('History')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class HistoryController {
-  constructor(private readonly historyService: HistoryService) {}
+  constructor(
+    private readonly service: HistoryService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
-  @Post()
-  create(@Body() createHistoryDto: CreateHistoryDto) {
-    return this.historyService.create(createHistoryDto);
-  }
+  logger = this.loggerService.getLogger(HistoryController.name);
 
+  @ApiOperation({ summary: 'lấy danh sách lịch sử' })
   @Get()
-  findAll() {
-    return this.historyService.findAll();
+  async listHistory(@Query() query: ListHistoryDto, @GetUser() user: User) {
+    return this.service.listHistory({ ...query, userId: user.id });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.historyService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateHistoryDto: UpdateHistoryDto) {
-    return this.historyService.update(+id, updateHistoryDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.historyService.remove(+id);
+  @ApiOperation({ summary: 'Tạo lịch sử audio book' })
+  @Post()
+  async writeHistory(@Body() dto: WriteHistoryDto, @GetUser() user: User) {
+    return this.service.writeHistory({ ...dto, user: user });
   }
 }

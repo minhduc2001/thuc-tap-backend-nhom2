@@ -43,7 +43,10 @@ export class ConfigService {
 
   // mailer
   EMAIL = _process.env.EMAIL;
-  MAIL_PASSWORD = _process.env.MAIL_PASSWORD;
+  EMAIL_CLIENT_ID = _process.env.EMAIL_CLIENT_ID;
+  EMAIL_CLIENT_SECRET = _process.env.EMAIL_CLIENT_SECRET;
+  EMAIL_REDIRECT_URI = _process.env.EMAIL_REDIRECT_URI;
+  EMAIL_REFRESH_TOKEN = _process.env.EMAIL_REFRESH_TOKEN;
 
   // file
   MAX_FILE_SIZE = 10000000; // 10MB;

@@ -9,17 +9,44 @@ import {
   ITokens,
 } from './interfaces/auth.interface';
 import * as exc from '@base/api/exception.reslover';
-import { LoginDto, RegisterDto } from './dtos/auth.dto';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dtos/auth.dto';
 import { User } from '@/user/user.entity';
+import { MailerService } from '@/mailer/mailer.service';
+import { generateUUID } from '@/base/helper/function.helper';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
     private readonly loggerService: LoggerService,
   ) {}
 
   logger = this.loggerService.getLogger(AuthService.name);
+
+  private readonly otps: Map<string, string> = new Map();
+
+  generateOtp(): string {
+    const otp = generateUUID();
+    return otp;
+  }
+
+  storeOtp(email: string, otp: string): void {
+    this.otps.set(email, otp);
+  }
+
+  getOtp(email: string): string | undefined {
+    return this.otps.get(email);
+  }
+
+  clearOtp(email: string): void {
+    this.otps.delete(email);
+  }
 
   async login(dto: LoginDto): Promise<any> {
     const { email, password } = dto;
@@ -95,6 +122,39 @@ export class AuthService {
     const user = await this.userService.getUser(userId);
     user.refreshToken = '';
     await user.save();
+  }
+
+  async forgot(dto: ForgotPasswordDto) {
+    const user = await this.userService.getUserByUniqueKey({
+      email: dto.email,
+    });
+    if (!user) throw new exc.BadRequest({ message: 'không tồn tại email này' });
+    const otp = this.generateOtp();
+
+    this.storeOtp(dto.email, otp);
+    console.log(this.otps);
+    await this.mailerService.sendMail(user.email, 'Reset password', otp);
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const { email, otp, newPassword } = dto;
+
+    const user = await this.userService.getUserByUniqueKey({
+      email: dto.email,
+    });
+    if (!user) throw new exc.BadRequest({ message: 'không tồn tại email này' });
+
+    console.log(this.otps);
+
+    const storedOtp = this.getOtp(email);
+    if (!storedOtp || storedOtp !== otp) {
+      throw new exc.BadRequest({ message: 'Invalid OTP.' });
+    }
+
+    user.setPassword(newPassword);
+    await user.save();
+    this.clearOtp(email);
+    return true;
   }
 
   async thirdPartyLogin(data: any) {

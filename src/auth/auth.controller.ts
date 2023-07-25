@@ -11,7 +11,12 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Public } from './decorator/public.decorator';
-import { LoginDto, RegisterDto } from './dtos/auth.dto';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+} from './dtos/auth.dto';
 import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { RefreshTokenGuard } from './guard/jwt-refresh.guard';
@@ -65,6 +70,18 @@ export class AuthController {
   ) {
     res.cookie('auth-cookie', '', { maxAge: -1 });
     return this.authService.logout(userId);
+  }
+
+  @ApiOperation({ summary: 'forgot-password' })
+  @Post('forgot-password')
+  async forgot(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgot(dto);
+  }
+
+  @ApiOperation({ summary: 'reset-password' })
+  @Post('reset-password')
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 
   @Get('google')

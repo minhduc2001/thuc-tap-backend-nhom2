@@ -20,4 +20,7 @@ export class History extends AbstractEntity {
   @ManyToOne(() => AudioBook, (audioBook) => audioBook.history)
   @JoinColumn()
   audioBook: AudioBook;
+
+  @Column({ nullable: true, default: 0 })
+  duration: number;
 }

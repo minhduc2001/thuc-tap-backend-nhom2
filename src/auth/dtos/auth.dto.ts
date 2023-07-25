@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Trim } from '@/base/decorators/common.decorator';
 
 export class LoginDto {
   @ApiProperty({ required: true, example: '0768368218' })
@@ -16,3 +17,19 @@ export class LoginDto {
 }
 
 export class RegisterDto extends LoginDto {}
+
+export class ForgotPasswordDto extends PickType(LoginDto, ['email']) {}
+
+export class ResetPasswordDto extends ForgotPasswordDto {
+  @ApiProperty({ required: true, example: '' })
+  @IsNotEmpty()
+  @IsString()
+  @Trim()
+  newPassword: string;
+
+  @ApiProperty({ required: true, example: '' })
+  @IsNotEmpty()
+  @IsString()
+  @Trim()
+  otp: string;
+}

@@ -17,6 +17,7 @@ import { HomeModule } from './home/home.module';
 import { SystemConfigurationModule } from './system-configuration/system-configuration.module';
 import { CommentModule } from './comment/comment.module';
 import { HelperModule } from './base/helper/helper.module';
+import { MailerModule } from './mailer/mailer.module';
 
 const baseModules = [ConfigModule, LoggerModule, HelperModule];
 const appModules = [
@@ -36,6 +37,7 @@ const appModules = [
     ...appModules,
     TypeOrmModule.forRoot(dbConfig),
     CommentModule,
+    MailerModule,
   ],
   controllers: [],
   providers: [],
