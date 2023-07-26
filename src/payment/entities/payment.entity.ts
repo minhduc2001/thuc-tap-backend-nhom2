@@ -9,6 +9,12 @@ export class Payment extends AbstractEntity {
   @Column()
   amount: number;
 
+  @Column({ nullable: true })
+  requestId: string;
+
+  @Column({ nullable: true })
+  orderId: string;
+
   @Column({
     enum: EMethodPayment,
     default: null,

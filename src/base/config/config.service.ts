@@ -54,10 +54,10 @@ export class ConfigService {
   UPLOAD_LOCATION_AUDIO = 'audio';
 
   // Momo
-  PARTNER_CODE = _process.env.PARTNER_CODE;
-  ACCESS_KEY = _process.env.ACCESS_KEY;
-  SECRET_KEY = _process.env.SECRET_KEY;
-  ENVIRONMENT = _process.env.ENVIRONMENT ?? 'sandbox';
+  MOMO_PARTNER_CODE = _process.env.MOMO_PARTNER_CODE;
+  MOMO_ACCESS_KEY = _process.env.MOMO_ACCESS_KEY;
+  MOMO_SECRET_KEY = _process.env.MOMO_SECRET_KEY;
+  MOMO_ENVIRONMENT = _process.env.MOMO_ENVIRONMENT ?? 'development';
 
   // Redis
   REDIS_HOST = _process.env.REDIS_HOST;

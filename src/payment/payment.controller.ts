@@ -1,42 +1,44 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { PaymentService } from './payment.service';
-import { CreatePaymentDto } from './dto/create-payment.dto';
-import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { PaymentService } from '@/payment/payment.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Public } from '@/auth/decorator/public.decorator';
+import { CreatePaymentDto } from '@/payment/payment.dto';
+import { GetUser } from '@/auth/decorator/get-user.decorator';
+import { User } from '@/user/user.entity';
+import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
+import { Request, Response } from 'express';
 
+@ApiTags('Payment')
 @Controller('payment')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 export class PaymentController {
-  constructor(private readonly paymentService: PaymentService) {}
+  constructor(private readonly service: PaymentService) {}
 
   @Post()
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  async createPayment(
+    @Body() dto: CreatePaymentDto,
+    @GetUser() user: User,
+    // @Res() res: Response,
+  ) {
+    const url = await this.service.createPayment({ ...dto, user: user });
+    // res.redirect(url);
+    return url;
   }
 
-  @Get()
-  findAll() {
-    return this.paymentService.findAll();
-  }
+  @Public()
+  @Post('success')
+  async successPayment(@Body() body: any) {
+    console.log(body);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentService.update(+id, updatePaymentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paymentService.remove(+id);
+    return this.service.confirmPayment(body);
   }
 }

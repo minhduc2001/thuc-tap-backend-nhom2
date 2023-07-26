@@ -4,8 +4,8 @@ import { ApiProperty, PickType } from '@nestjs/swagger';
 import { Trim } from '@/base/decorators/common.decorator';
 
 export class LoginDto {
-  @ApiProperty({ required: true, example: '0768368218' })
-  @IsNotEmpty({ message: 'số điện thoại không được để trống' })
+  @ApiProperty({ required: true, example: 'nduc04@gmail.com' })
+  @IsNotEmpty({ message: 'email không được để trống' })
   @Transform(({ value }) => value && value.trim())
   @IsString()
   email: string;

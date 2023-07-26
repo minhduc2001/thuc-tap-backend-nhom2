@@ -23,7 +23,20 @@ services:
       - ./docker/database/postgres/init/:/docker-entrypoint-initdb.d
     env_file:
       - .env
-
+  redis:
+    container_name: redis-thuctapnhom2
+    image: redis:6.2.5-alpine
+    restart: always
+    ports:
+      - ${REDIS_PORT}:6379
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    volumes:
+      - ./docker/redis/init:/docker-entrypoint-initdb.d
+    networks:
+      - thuc-tap-network
+    env_file:
+      - .env
 networks:
   thuc-tap-network:
     driver: bridge

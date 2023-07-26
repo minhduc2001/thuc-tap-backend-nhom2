@@ -40,6 +40,8 @@ const appModules = [
   LibraryModule,
   HistoryModule,
   SystemConfigurationModule,
+  PaymentModule,
+  PackageModule,
 ];
 @Module({
   imports: [
