@@ -14,7 +14,6 @@ import { CreatePaymentDto } from '@/payment/payment.dto';
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { User } from '@/user/user.entity';
 import { JwtAuthGuard } from '@/auth/guard/jwt-auth.guard';
-import { Request, Response } from 'express';
 
 @ApiTags('Payment')
 @Controller('payment')
@@ -24,14 +23,8 @@ export class PaymentController {
   constructor(private readonly service: PaymentService) {}
 
   @Post()
-  async createPayment(
-    @Body() dto: CreatePaymentDto,
-    @GetUser() user: User,
-    // @Res() res: Response,
-  ) {
-    const url = await this.service.createPayment({ ...dto, user: user });
-    // res.redirect(url);
-    return url;
+  async createPayment(@Body() dto: CreatePaymentDto, @GetUser() user: User) {
+    return this.service.createPayment({ ...dto, user: user });
   }
 
   @Public()

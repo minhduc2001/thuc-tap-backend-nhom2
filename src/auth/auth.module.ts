@@ -13,6 +13,8 @@ import { UserModule } from '@/user/user.module';
 // BASE
 import { config } from '@/config';
 import { RtStrategy } from '@/auth/strategies/rt.strategy';
+import { FacebookStrategy } from './strategies/facebook.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { RtStrategy } from '@/auth/strategies/rt.strategy';
     AuthService,
     JwtStrategy,
     RtStrategy,
+    FacebookStrategy,
+    GoogleStrategy,
     // { provide: APP_GUARD, useClass: JwtAuthGuard },
   ],
   controllers: [AuthController],

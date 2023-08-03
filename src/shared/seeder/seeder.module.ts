@@ -8,12 +8,20 @@ import { AudioBookSeed } from './audio-book.seed';
 import { AudioBookModule } from '@/audio-book/audio-book.module';
 import { Permission } from '@/role/entities/permission.entity';
 import { AudioBook } from '@/audio-book/entities/audio-book.entity';
+import { Genre } from '@/genre/entities/genre.entity';
+import { GenreSeed } from './genre.seed';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Permission, AudioBook]),
+    TypeOrmModule.forFeature([User, Permission, AudioBook, Genre]),
     AudioBookModule,
   ],
-  providers: [SeederService, UserSeed, PermissionSeed, AudioBookSeed],
+  providers: [
+    SeederService,
+    UserSeed,
+    PermissionSeed,
+    AudioBookSeed,
+    GenreSeed,
+  ],
 })
 export class SeedersModule {}

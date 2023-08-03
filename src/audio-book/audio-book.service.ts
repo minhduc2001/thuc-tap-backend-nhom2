@@ -67,7 +67,10 @@ export class AudioBookService extends BaseService<AudioBook> {
   }
 
   async getAudioBook(id: number) {
-    const audioBook = await this.repository.findOne({ where: { id: id } });
+    const audioBook = await this.repository.findOne({
+      where: { id: id },
+      relations: { genre: true, author: true },
+    });
     if (!audioBook)
       throw new exc.BadRequest({ message: 'Không tồn tại audio book' });
     await this.preResponse([audioBook]);

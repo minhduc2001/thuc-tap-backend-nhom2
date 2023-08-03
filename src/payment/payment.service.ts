@@ -20,6 +20,7 @@ import {
   IResponsePayment,
   IResponseSuccessPayment,
 } from 'momo-payment-api/src/type';
+import { MailerService } from '@/mailer/mailer.service';
 
 @Injectable()
 export class PaymentService extends BaseService<Payment> {
@@ -34,6 +35,7 @@ export class PaymentService extends BaseService<Payment> {
     private readonly loggerService: LoggerService,
     private readonly redisService: RedisService,
     private readonly subscriptionService: SubscriptionService,
+    private readonly mailerService: MailerService,
   ) {
     super(repository);
     this.redisSubscriber = new Redis();
@@ -114,7 +116,13 @@ export class PaymentService extends BaseService<Payment> {
         10 * 60,
       );
 
-      return res.payUrl;
+      await this.mailerService.sendMail(
+        dto.user.email,
+        'Thanh toán gói cước',
+        res.payUrl,
+      );
+
+      return true;
     } catch (e) {
       this.logger.warn(e);
       throw new exc.BadRequest({ message: e.message });

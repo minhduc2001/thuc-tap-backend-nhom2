@@ -68,7 +68,7 @@ export class UserService extends BaseService<User> {
       user.library = [lib];
       await user.save();
 
-      return;
+      return user;
     } catch (e) {
       this.logger.warn(e);
       throw new exc.BadRequest({ message: e.message });

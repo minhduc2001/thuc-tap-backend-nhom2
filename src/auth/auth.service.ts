@@ -164,7 +164,7 @@ export class AuthService {
       });
 
       if (!user) {
-        // user = await this.userService.createUser({...data})
+        user = await this.userService.createUser(data);
       }
 
       const payload: IJWTPayload = {
