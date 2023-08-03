@@ -133,7 +133,7 @@ export class AudioBookService extends BaseService<AudioBook> {
     }
 
     if (dto.audio) {
-      this.fileService.removeFile(audioBook.url, 'audio');
+      if (audioBook.url) this.fileService.removeFile(audioBook.url, 'audio');
       const url = (
         await this.encodeHLSWithMultipleAudioStreams(dto.audio)
       ).split('/');
