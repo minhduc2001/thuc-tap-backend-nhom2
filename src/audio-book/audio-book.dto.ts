@@ -16,8 +16,13 @@ import {
   IsString,
 } from 'class-validator';
 import { ToNumber, ToNumbers, Trim } from '@base/decorators/common.decorator';
+import { User } from '@/user/user.entity';
 
-export class ListAudioBookDto extends ListDto {}
+export class ListAudioBookDto extends ListDto {
+  @ApiHideProperty()
+  @IsOptional()
+  user: User;
+}
 
 export class UploadMusicDto {
   @ApiProperty({

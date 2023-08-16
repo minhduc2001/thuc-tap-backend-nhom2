@@ -40,6 +40,9 @@ export class AudioBook extends AbstractEntity {
   @Column({ nullable: true })
   duration?: number;
 
+  @Column({ nullable: true, type: 'boolean', default: true })
+  free: boolean;
+
   @ManyToOne(() => Genre, (genre) => genre.audioBook)
   @JoinColumn()
   genre?: Genre;

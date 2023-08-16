@@ -22,4 +22,11 @@ export class UrlService {
       filename.split('.')[0]
     }/${filename}`;
   }
+
+  uploadUrls(filenames: string[]) {
+    return filenames.map((filename) => {
+      if (filename.includes('http')) return filename;
+      return `http://${config.IP}:${config.PORT}/uploads/${filename}`;
+    });
+  }
 }

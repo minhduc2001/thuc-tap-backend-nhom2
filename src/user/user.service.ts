@@ -16,6 +16,7 @@ import {
 } from '@/user/interfaces/user.interface';
 import { ListUserDto, UploadAvatarDto } from '@/user/dtos/user.dto';
 import { LibraryService } from '@/library/services/library.service';
+import { UrlService } from '@/base/helper/url.service';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -24,11 +25,20 @@ export class UserService extends BaseService<User> {
     protected readonly repository: Repository<User>,
     private readonly loggerService: LoggerService,
     private readonly libraryService: LibraryService,
+    private readonly urlService: UrlService,
   ) {
     super(repository);
   }
 
   logger = this.loggerService.getLogger(UserService.name);
+
+  preResponse(users: User[]) {
+    users.map((user) => {
+      if (user.avatar) {
+        user.avatar = this.urlService.uploadUrl(user.avatar);
+      }
+    });
+  }
 
   getUserByUniqueKey(option: IUserGetByUniqueKey): Promise<User> {
     const findOption: Record<string, any>[] = Object.entries(option).map(
@@ -48,7 +58,9 @@ export class UserService extends BaseService<User> {
   }
 
   async getUserById(id: number): Promise<User | undefined> {
-    return this.repository.findOne({ where: { id: id } });
+    const user = await this.repository.findOne({ where: { id: id } });
+    this.preResponse([user]);
+    return user;
   }
 
   async getUser(id: number) {

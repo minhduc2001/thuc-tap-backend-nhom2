@@ -46,34 +46,43 @@ export class AudioBookService extends BaseService<AudioBook> {
 
   logger = this.loggerService.getLogger(AudioBookService.name);
 
-  async preResponse(audioBooks: AudioBook[]) {
+  async preResponse(audioBooks: AudioBook[], user: User) {
     for (const audioBook of audioBooks) {
-      if (audioBook.url) audioBook.url = this.urlService.dataUrl(audioBook.url);
+      if (
+        audioBook.url &&
+        (user.role === 'admin' || user.packageId || audioBook.free)
+      )
+        audioBook.url = this.urlService.dataUrl(audioBook.url);
+      else audioBook.url = '';
       if (audioBook?.image)
         audioBook.image = this.urlService.uploadUrl(audioBook.image);
     }
   }
 
   async listAudioBook(query: ListAudioBookDto) {
+    console.log(query.sortBy);
+
     const config: PaginateConfig<AudioBook> = {
-      sortableColumns: ['updatedAt'],
+      sortableColumns: ['updatedAt', 'title'],
       defaultSortBy: [['updatedAt', 'DESC']],
       searchableColumns: ['title'],
       relations: ['author', 'genre'],
     };
     const data = await this.listWithPage(query, config);
-    await this.preResponse(data.results);
+    await this.preResponse(data.results, query.user);
     return data;
   }
 
-  async getAudioBook(id: number) {
+  async getAudioBook(dto: any) {
     const audioBook = await this.repository.findOne({
-      where: { id: id },
+      where: { id: dto.id },
       relations: { genre: true, author: true },
     });
     if (!audioBook)
       throw new exc.BadRequest({ message: 'Không tồn tại audio book' });
-    await this.preResponse([audioBook]);
+    console.log(dto);
+
+    await this.preResponse([audioBook], dto.user);
     return audioBook;
   }
 
@@ -88,6 +97,8 @@ export class AudioBookService extends BaseService<AudioBook> {
 
   async createAudioBook(dto: CreateAudioBookDto) {
     try {
+      console.log(dto);
+
       const authors = await this._findAuthor(dto.author);
       const genre = await this._findGenre(dto.genre);
 

@@ -9,6 +9,14 @@ export const SwaggerConfig = (app: INestApplication, apiVersion: string) => {
     .setVersion('1.0')
     .addBearerAuth()
     .addServer(`http://localhost:${config.PORT}/api/v${apiVersion}`, 'local')
+    .addServer(
+      `http://${config.IP}:${config.PORT}/api/v${apiVersion}`,
+      'host-ip',
+    )
+    .addServer(
+      `https://c665-14-232-135-216.ngrok-free.app/api/v1`,
+      'ngrok server',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

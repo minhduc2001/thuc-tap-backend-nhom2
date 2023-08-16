@@ -37,7 +37,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @ApiOperation({ summary: 'get me' })
-  @Get('me')
+  @Get('get-me')
   async getMe(@GetUser() user: User) {
     return user;
   }

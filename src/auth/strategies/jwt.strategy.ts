@@ -23,7 +23,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: IJWTPayload) {
     const user = await this.userService.getUserById(payload.sub);
     if (!user) throw new exc.Unauthorized({ message: 'Token is not valid' });
-    delete user.password;
+    delete user?.password;
+    delete user?.refreshToken;
     return user;
   }
 }

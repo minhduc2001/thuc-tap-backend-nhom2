@@ -10,6 +10,9 @@ export class Author extends AbstractEntity {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ nullable: true })
+  image: string;
+
   @ManyToMany(() => AudioBook, (audioBook) => audioBook.author)
   audioBook: AudioBook[];
 }

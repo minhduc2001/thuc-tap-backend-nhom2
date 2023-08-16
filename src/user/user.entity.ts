@@ -11,6 +11,7 @@ import { EState } from '@shared/enum/common.enum';
 import { Payment } from '@/payment/entities/payment.entity';
 import { Library } from '@/library/entities/library.entity';
 import { History } from '@/history/entities/history.entity';
+import { Support } from '@/support/entities/support.entity';
 
 @Entity()
 export class User extends AbstractEntity {
@@ -56,8 +57,8 @@ export class User extends AbstractEntity {
   @Column({ type: 'boolean', default: false })
   verified: boolean;
 
-  @Column({ default: 'local' })
-  provider: string;
+  @OneToMany(() => Support, (support) => support.user)
+  supports: Support[];
 
   @OneToMany(() => Payment, (payment) => payment.user)
   @JoinColumn()

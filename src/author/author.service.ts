@@ -11,6 +11,7 @@ import { PaginateConfig } from '@base/service/paginate';
 // APPS
 import { Author } from '@/author/entities/author.entity';
 import { ListAuthorDto } from '@/author/author.dto';
+import { UrlService } from '@/base/helper/url.service';
 
 @Injectable()
 export class AuthorService extends BaseService<Author> {
@@ -18,15 +19,23 @@ export class AuthorService extends BaseService<Author> {
     @InjectRepository(Author)
     protected readonly repository: Repository<Author>,
     private readonly loggerService: LoggerService,
+    private readonly urlService: UrlService,
   ) {
     super(repository);
   }
 
   private logger = this.loggerService.getLogger(AuthorService.name);
 
+  preResponse(authors: Author[]) {
+    authors.map((author) => {
+      if (author.image) author.image = this.urlService.uploadUrl(author.image);
+    });
+  }
+
   async listAuthor(query: ListAuthorDto) {
     const config: PaginateConfig<Author> = {
       sortableColumns: ['id'],
+      searchableColumns: ['name'],
     };
 
     return this.listWithPage(query, config);

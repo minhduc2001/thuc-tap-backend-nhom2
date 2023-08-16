@@ -21,6 +21,7 @@ import { MailerModule } from './mailer/mailer.module';
 import { SeedersModule } from './shared/seeder/seeder.module';
 import { UploadFileModule } from './base/multer/multer.module';
 import { RoleModule } from './role/role.module';
+import { SupportModule } from './support/support.module';
 
 const baseModules = [
   ConfigModule,
@@ -50,6 +51,7 @@ const appModules = [
     TypeOrmModule.forRoot(dbConfig),
     CommentModule,
     MailerModule,
+    SupportModule,
   ],
   controllers: [],
   providers: [],

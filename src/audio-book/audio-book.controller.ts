@@ -47,6 +47,8 @@ import { ERole } from '@/role/enum/roles.enum';
 import { GetUser } from '@/auth/decorator/get-user.decorator';
 import { User } from '@/user/user.entity';
 import { RolesGuard } from '@/role/roles.guard';
+import * as path from 'path';
+import { Public } from '@/auth/decorator/public.decorator';
 
 @Controller('audio-book')
 @ApiTags('Audio Book')
@@ -63,14 +65,23 @@ export class AudioBookController {
 
   @ApiOperation({ summary: 'lấy danh sách audio book' })
   @Get()
-  async listAudioBook(@Query() query: ListAudioBookDto) {
-    return this.service.listAudioBook(query);
+  async listAudioBook(@Query() query: ListAudioBookDto, @GetUser() user: User) {
+    return this.service.listAudioBook({ ...query, user: user });
+  }
+
+  @Public()
+  @Get('/play')
+  async play(@Query('songName') songName: string) {
+    if (!songName) throw new exc.NotFound({});
+    console.log(process.cwd());
+
+    const filePath = path.join(process.cwd(), 'audio', songName);
   }
 
   @ApiOperation({ summary: 'Lấy chi tiết audio book' })
   @Get(':id')
-  async getAudioBook(@Param() param: ParamIdDto) {
-    return this.service.getAudioBook(param.id);
+  async getAudioBook(@Param() param: ParamIdDto, @GetUser() user: User) {
+    return this.service.getAudioBook({ ...param, user: user });
   }
 
   @ApiOperation({ summary: 'Tạo audio book' })
