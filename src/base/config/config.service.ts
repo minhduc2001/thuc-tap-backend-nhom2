@@ -49,7 +49,7 @@ export class ConfigService {
   EMAIL_REFRESH_TOKEN = _process.env.EMAIL_REFRESH_TOKEN;
 
   // file
-  MAX_FILE_SIZE = 10000000; // 10MB;
+  MAX_FILE_SIZE = 200000000; // 10MB;
   UPLOAD_LOCATION = 'uploads';
   UPLOAD_LOCATION_AUDIO = 'audio';
 

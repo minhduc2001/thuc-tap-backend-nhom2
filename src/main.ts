@@ -20,7 +20,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(`/uploads`, express.static('uploads'));
   app.use(`/audio`, express.static('audio'));
-  app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(bodyParser.json({ limit: '200mb' }));
   app.use(cookieParser());
   app.use(morgan('dev'));
 

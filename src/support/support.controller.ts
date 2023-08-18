@@ -26,4 +26,9 @@ export class SupportController {
   getAll(@Query() query: ListSupportDto, @GetUser() user: User) {
     return this.supportService.getAll({ ...query, user: user });
   }
+
+  @Get(':code')
+  getSupport(@Param() param: { code: string }, @GetUser() user: User) {
+    return this.supportService.getOne(param.code, user);
+  }
 }

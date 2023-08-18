@@ -13,11 +13,15 @@ export class UrlService {
 
   uploadUrl(filename: string): string {
     if (filename.includes('http')) return filename;
+    return `https://373d-14-232-135-216.ngrok-free.app/uploads/${filename}`;
     return `http://${config.IP}:${config.PORT}/uploads/${filename}`;
   }
 
   dataUrl(filename: string): string {
     if (filename.includes('http')) return filename;
+    return `https://373d-14-232-135-216.ngrok-free.app/audio/${
+      filename.split('.')[0]
+    }/${filename}`;
     return `http://${config.IP}:${config.PORT}/audio/${
       filename.split('.')[0]
     }/${filename}`;

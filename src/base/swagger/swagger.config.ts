@@ -14,7 +14,7 @@ export const SwaggerConfig = (app: INestApplication, apiVersion: string) => {
       'host-ip',
     )
     .addServer(
-      `https://c665-14-232-135-216.ngrok-free.app/api/v1`,
+      `https://2f75-14-232-135-216.ngrok-free.app/api/v1`,
       'ngrok server',
     )
     .build();

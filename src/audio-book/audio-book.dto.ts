@@ -17,6 +17,7 @@ import {
 } from 'class-validator';
 import { ToNumber, ToNumbers, Trim } from '@base/decorators/common.decorator';
 import { User } from '@/user/user.entity';
+import { Transform } from 'class-transformer';
 
 export class ListAudioBookDto extends ListDto {
   @ApiHideProperty()
@@ -64,6 +65,12 @@ export class CreateAudioBookDto extends UploadMusicDto {
   desc: string;
 
   @ApiProperty({ required: false })
+  @IsBoolean()
+  @Transform(({ value }) => (value == 'true' ? true : false))
+  @IsOptional()
+  free: boolean;
+
+  @ApiProperty({ required: false })
   @ToNumber()
   @IsOptional()
   @IsPositive()
@@ -91,6 +98,7 @@ export class UpdateAudioBookDto extends PickType(CreateAudioBookDto, [
   'genre',
   'publishDate',
   'desc',
+  'free',
 ]) {
   @ApiProperty({ required: false })
   @IsOptional()

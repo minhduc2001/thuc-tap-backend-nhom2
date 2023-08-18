@@ -17,11 +17,11 @@ import { GenreSeed } from './genre.seed';
     AudioBookModule,
   ],
   providers: [
-    SeederService,
-    UserSeed,
-    PermissionSeed,
-    AudioBookSeed,
-    GenreSeed,
+    // SeederService,
+    // UserSeed,
+    // PermissionSeed,
+    // AudioBookSeed,
+    // GenreSeed,
   ],
 })
 export class SeedersModule {}

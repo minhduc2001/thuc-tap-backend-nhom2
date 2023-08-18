@@ -69,6 +69,11 @@ export class UserService extends BaseService<User> {
     return user;
   }
 
+  async activeUser(id: number) {
+    await this.repository.update(id, { verified: true });
+    return true;
+  }
+
   async createUser(data: ICreateUser) {
     try {
       const user: User = this.repository.create(data);

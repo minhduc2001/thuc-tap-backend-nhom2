@@ -17,7 +17,6 @@ import { TerminatePackageConsumer } from './terminate-package-consumer.service';
       name: 'terminate-package',
     }),
     PackageModule,
-    RedisModule,
   ],
   controllers: [PaymentController],
   providers: [PaymentService, SubscriptionService, TerminatePackageConsumer],

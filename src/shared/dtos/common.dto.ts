@@ -63,3 +63,14 @@ export class BulkIdsDto {
   @IsPositive({ each: true })
   ids: number[];
 }
+
+export class UploadImageDto {
+  @ApiProperty({
+    required: false,
+    type: 'string',
+    format: 'binary',
+    description: 'File to upload',
+  })
+  @IsOptional()
+  image: string;
+}

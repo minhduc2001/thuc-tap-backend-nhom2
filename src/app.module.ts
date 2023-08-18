@@ -22,6 +22,7 @@ import { SeedersModule } from './shared/seeder/seeder.module';
 import { UploadFileModule } from './base/multer/multer.module';
 import { RoleModule } from './role/role.module';
 import { SupportModule } from './support/support.module';
+import { RedisModule } from './base/redis/redis.module';
 
 const baseModules = [
   ConfigModule,
@@ -29,6 +30,7 @@ const baseModules = [
   HelperModule,
   UploadFileModule,
   SeedersModule,
+  RedisModule,
 ];
 const appModules = [
   AuthModule,

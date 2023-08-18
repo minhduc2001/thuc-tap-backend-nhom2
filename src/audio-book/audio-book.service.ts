@@ -56,6 +56,13 @@ export class AudioBookService extends BaseService<AudioBook> {
       else audioBook.url = '';
       if (audioBook?.image)
         audioBook.image = this.urlService.uploadUrl(audioBook.image);
+
+      if (audioBook?.author?.length > 0) {
+        audioBook.author.map((author) => {
+          if (author.image)
+            author.image = this.urlService.uploadUrl(author.image);
+        });
+      }
     }
   }
 
@@ -97,8 +104,6 @@ export class AudioBookService extends BaseService<AudioBook> {
 
   async createAudioBook(dto: CreateAudioBookDto) {
     try {
-      console.log(dto);
-
       const authors = await this._findAuthor(dto.author);
       const genre = await this._findGenre(dto.genre);
 
@@ -119,6 +124,7 @@ export class AudioBookService extends BaseService<AudioBook> {
         image: dto.image,
         url: url?.at(-1),
         duration: dto.duration,
+        free: dto.free ?? true,
       });
 
       return true;
@@ -129,6 +135,8 @@ export class AudioBookService extends BaseService<AudioBook> {
   }
 
   async updateAudioBook(dto: UpdateAudioBookDto) {
+    console.log(dto);
+
     const audioBook = await this.getAudioBookWithoutImage(dto.id);
 
     let authors = null;
@@ -155,6 +163,7 @@ export class AudioBookService extends BaseService<AudioBook> {
     audioBook.author = authors?.length > 0 ? authors : audioBook.author;
     audioBook.genre = genre ?? audioBook.genre;
     audioBook.image = dto.image ?? audioBook.image;
+    audioBook.free = dto.free ?? audioBook.free;
     await audioBook.save();
     return true;
   }

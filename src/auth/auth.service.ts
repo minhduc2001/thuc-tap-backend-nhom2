@@ -10,6 +10,7 @@ import {
 } from './interfaces/auth.interface';
 import * as exc from '@base/api/exception.reslover';
 import {
+  ActiveUserDto,
   ForgotPasswordDto,
   LoginDto,
   RegisterDto,
@@ -18,6 +19,7 @@ import {
 import { User } from '@/user/user.entity';
 import { MailerService } from '@/mailer/mailer.service';
 import { generateUUID } from '@/base/helper/function.helper';
+import { RedisService } from '@/base/redis/redis.service';
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,27 +27,14 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly mailerService: MailerService,
     private readonly loggerService: LoggerService,
+    private readonly redisService: RedisService,
   ) {}
 
   logger = this.loggerService.getLogger(AuthService.name);
 
-  private readonly otps: Map<string, string> = new Map();
-
   generateOtp(): string {
     const otp = generateUUID();
     return otp;
-  }
-
-  storeOtp(email: string, otp: string): void {
-    this.otps.set(email, otp);
-  }
-
-  getOtp(email: string): string | undefined {
-    return this.otps.get(email);
-  }
-
-  clearOtp(email: string): void {
-    this.otps.delete(email);
   }
 
   async login(dto: LoginDto): Promise<any> {
@@ -75,7 +64,25 @@ export class AuthService {
     });
 
     if (isExists) throw new exc.BadRequest({ message: 'email already is use' });
-    return this.userService.createUser(dto);
+    const user = await this.userService.createUser(dto);
+    const otp = this.generateOtp();
+    await this.redisService.setWithExpiration(`ACTIVE${user.id}`, otp, 600);
+    await this.mailerService.sendMail(
+      user.email,
+      'Kich hoat tai khoan',
+      `Ma se het han sau 10 phut : ${otp}`,
+    );
+
+    return true;
+  }
+
+  async activeUser(dto: ActiveUserDto) {
+    const otp = await this.redisService.get(`ACTIVE${dto.id}`);
+    if (!otp || otp !== dto.otp)
+      throw new exc.BadRequest({ message: 'Invalid OTP' });
+    await this.redisService.del(`ACTIVE${dto.id}`);
+    const user = await this.userService.getUserById(dto.id);
+    await this.userService.activeUser(user.id);
   }
 
   async updateRefreshToken(user: User, refreshToken: string) {
@@ -131,9 +138,10 @@ export class AuthService {
     if (!user) throw new exc.BadRequest({ message: 'không tồn tại email này' });
     const otp = this.generateOtp();
 
-    this.storeOtp(dto.email, otp);
-    console.log(this.otps);
+    await this.redisService.setWithExpiration(dto.email, otp, 600);
+
     await this.mailerService.sendMail(user.email, 'Reset password', otp);
+    return true;
   }
 
   async resetPassword(dto: ResetPasswordDto) {
@@ -144,16 +152,14 @@ export class AuthService {
     });
     if (!user) throw new exc.BadRequest({ message: 'không tồn tại email này' });
 
-    console.log(this.otps);
-
-    const storedOtp = this.getOtp(email);
+    const storedOtp = await this.redisService.get(email);
     if (!storedOtp || storedOtp !== otp) {
       throw new exc.BadRequest({ message: 'Invalid OTP.' });
     }
 
     user.setPassword(newPassword);
     await user.save();
-    this.clearOtp(email);
+    await this.redisService.del(email);
     return true;
   }
 

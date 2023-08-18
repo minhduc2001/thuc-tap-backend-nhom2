@@ -10,7 +10,11 @@ import { PaginateConfig } from '@base/service/paginate';
 
 // APPS
 import { Author } from '@/author/entities/author.entity';
-import { ListAuthorDto } from '@/author/author.dto';
+import {
+  ListAuthorDto,
+  SaveAuthorDto,
+  UpdateAuthorDto,
+} from '@/author/author.dto';
 import { UrlService } from '@/base/helper/url.service';
 
 @Injectable()
@@ -38,12 +42,29 @@ export class AuthorService extends BaseService<Author> {
       searchableColumns: ['name'],
     };
 
-    return this.listWithPage(query, config);
+    const resp = await this.listWithPage(query, config);
+    this.preResponse(resp.results);
+    return resp;
   }
 
   async getAuthor(id: number) {
     const author = await this.repository.findOne({ where: { id: id } });
     if (!author) throw new exc.BadRequest({ message: 'author không tồn tại' });
+    this.preResponse([author]);
     return author;
+  }
+
+  async saveAuthor(dto: SaveAuthorDto) {
+    return this.repository.save({
+      name: dto.name,
+      description: dto.description ?? '',
+      image: dto.image ?? '',
+    });
+  }
+
+  async updateAuthor(dto: UpdateAuthorDto) {
+    const author = await this.getAuthor(dto.id);
+    await this.repository.update(author.id, { ...dto });
+    return true;
   }
 }

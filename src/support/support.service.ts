@@ -7,6 +7,7 @@ import { UrlService } from '@/base/helper/url.service';
 import { PaginateConfig } from '@/base/service/paginate';
 import { ListSupportDto } from './support.dto';
 import { User } from '@/user/user.entity';
+import * as exc from '@base/api/exception.reslover';
 
 @Injectable()
 export class SupportService extends BaseService<Support> {
@@ -40,20 +41,22 @@ export class SupportService extends BaseService<Support> {
     return this.listWithPage(query, config);
   }
 
-  async getOne(id: number, user: User) {
+  async getOne(code: string, user: User) {
     let support: Support;
     if (user.role === 'admin') {
       support = await this.findOne({
-        where: { id: id },
+        where: { code: code },
         relations: ['user', 'subject'],
       });
       this.preResponse([support]);
       return support;
     }
     support = await this.findOne({
-      where: { id: id, user: { id: user.id } },
+      where: { code: code, user: { id: user.id } },
       relations: ['subject'],
     });
+    if (!support)
+      throw new exc.BadRequest({ message: 'Không có yêu cầu hỗ trợ này!' });
     this.preResponse([support]);
     return support;
   }
