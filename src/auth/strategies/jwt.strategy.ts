@@ -9,6 +9,7 @@ import { IJWTPayload } from '@/auth/interfaces/auth.interface';
 // BASE
 import * as exc from '@base/api/exception.reslover';
 import { config } from '@/config';
+import { ERole } from '@/role/enum/roles.enum';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -23,6 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: IJWTPayload) {
     const user = await this.userService.getUserById(payload.sub);
     if (!user) throw new exc.Unauthorized({ message: 'Token is not valid' });
+    if (!user.verified && user.role !== ERole.Admin)
+      throw new exc.BusinessException({
+        message: 'Tài khoản chưa được kích hoạt',
+      });
     delete user?.password;
     delete user?.refreshToken;
     return user;
