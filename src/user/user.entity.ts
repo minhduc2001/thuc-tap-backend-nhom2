@@ -22,7 +22,7 @@ export class User extends AbstractEntity {
   phone: string;
 
   @Exclude()
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column({ nullable: false, unique: true })
