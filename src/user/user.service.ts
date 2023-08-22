@@ -77,7 +77,7 @@ export class UserService extends BaseService<User> {
   async createUser(data: ICreateUser) {
     try {
       const user: User = this.repository.create(data);
-      user.setPassword(data.password);
+      if (user.password) user.setPassword(data.password);
       const lib = await this.libraryService.createLibrary({
         name: 'Yêu thích',
         user: user,
