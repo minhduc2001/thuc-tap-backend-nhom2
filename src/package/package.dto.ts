@@ -1,4 +1,4 @@
-import { ListDto } from '@shared/dtos/common.dto';
+import { ListDto, UploadImageDto } from '@shared/dtos/common.dto';
 import { ApiHideProperty, ApiProperty, PickType } from '@nestjs/swagger';
 import {
   IsEnum,
@@ -11,7 +11,7 @@ import { ToNumber, Trim } from '@base/decorators/common.decorator';
 import { EPackageExpire } from '@/package/package.enum';
 
 export class ListPackageDto extends ListDto {}
-export class CreatePackageDto {
+export class CreatePackageDto extends UploadImageDto {
   @ApiProperty()
   @IsNotEmpty()
   @ToNumber()
@@ -40,6 +40,7 @@ export class UpdatePackageDto extends PickType(CreatePackageDto, [
   'amount',
   'description',
   'expire',
+  'image',
 ]) {
   @ApiHideProperty()
   @IsOptional()

@@ -67,7 +67,7 @@ export class AudioBookService extends BaseService<AudioBook> {
   }
 
   async listAudioBook(query: ListAudioBookDto) {
-    console.log(query.sortBy);
+    console.log(query.filter);
 
     const config: PaginateConfig<AudioBook> = {
       sortableColumns: ['updatedAt', 'title'],

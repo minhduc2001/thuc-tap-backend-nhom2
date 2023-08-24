@@ -11,6 +11,7 @@ import { PaginateConfig } from '@base/service/paginate';
 // APPS
 import { Genre } from '@/genre/entities/genre.entity';
 import { ListGenreDto } from '@/genre/genre.dto';
+import { UrlService } from '@base/helper/url.service';
 
 @Injectable()
 export class GenreService extends BaseService<Genre> {
@@ -18,11 +19,22 @@ export class GenreService extends BaseService<Genre> {
     @InjectRepository(Genre)
     protected readonly repository: Repository<Genre>,
     private readonly loggerService: LoggerService,
+    private readonly urlService: UrlService,
   ) {
     super(repository);
   }
 
   private logger = this.loggerService.getLogger(GenreService.name);
+
+  preResponse(genres: Genre[]) {
+    genres.map((genre: Genre) => {
+      if (genre.audioBook.length > 0) {
+        genre.audioBook.map((audio) => {
+          if (audio.image) audio.image = this.urlService.uploadUrl(audio.image);
+        });
+      }
+    });
+  }
 
   async listGenre(query: ListGenreDto) {
     const config: PaginateConfig<Genre> = {
@@ -30,6 +42,18 @@ export class GenreService extends BaseService<Genre> {
     };
 
     return this.listWithPage(query, config);
+  }
+
+  async listGenreWithAudioBook(query: ListGenreDto) {
+    const config: PaginateConfig<Genre> = {
+      sortableColumns: ['id'],
+      relations: ['audioBook'],
+      searchableColumns: ['name'],
+    };
+
+    const data = await this.listWithPage(query, config);
+    this.preResponse(data.results);
+    return data;
   }
 
   async getGenre(id: number) {

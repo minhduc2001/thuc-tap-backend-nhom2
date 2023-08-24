@@ -30,6 +30,12 @@ export class GenreController {
     return this.service.listGenre(query);
   }
 
+  @ApiOperation({ summary: '' })
+  @Get('search')
+  async search(@Query() query: ListGenreDto) {
+    return this.service.listGenreWithAudioBook(query);
+  }
+
   @ApiOperation({ summary: 'Lấy ra 1 thể loại' })
   @Get(':id')
   async getGenre(@Param() param: ParamIdDto) {

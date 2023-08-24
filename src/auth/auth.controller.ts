@@ -94,7 +94,7 @@ export class AuthController {
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const resp = await this.authService.thirdPartyLogin(req.user);
     res.cookie('auth-cookie', resp.refreshToken, { httpOnly: true });
-    res.redirect(`localhost:3000/login?accessToken=${resp.accessToken}`);
+    res.redirect(`http://localhost:3000/login?accessToken=${resp.accessToken}`);
     return this.authService.thirdPartyLogin(req.user);
   }
 

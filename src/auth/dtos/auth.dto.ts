@@ -16,7 +16,12 @@ export class LoginDto {
   password: string;
 }
 
-export class RegisterDto extends LoginDto {}
+export class RegisterDto extends LoginDto {
+  @ApiProperty({ required: true, example: 'ngo minh duc' })
+  @IsNotEmpty({ message: 'USER011101' })
+  @IsString()
+  username: string;
+}
 
 export class ForgotPasswordDto extends PickType(LoginDto, ['email']) {}
 

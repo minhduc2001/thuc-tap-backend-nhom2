@@ -7,8 +7,10 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Public } from '@/auth/decorator/public.decorator';
 import { PackageService } from '@/package/package.service';
 import {
@@ -19,6 +21,7 @@ import {
 import { Roles } from '@/role/roles.decorator';
 import { ERole } from '@/role/enum/roles.enum';
 import { BulkIdsDto, ParamIdDto } from '@shared/dtos/common.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Package')
 @Controller('package')
@@ -28,8 +31,13 @@ export class PackageController {
   @Public()
   @Roles(ERole.Admin)
   @Post()
-  async createPackage(@Body() dto: CreatePackageDto) {
-    return this.service.createPackage(dto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  async createPackage(
+    @Body() dto: CreatePackageDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.service.createPackage({ ...dto, image: file.filename });
   }
 
   @Get()
@@ -38,11 +46,18 @@ export class PackageController {
   }
 
   @Put(':id')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   async updatePackage(
     @Param() param: ParamIdDto,
     @Body() dto: UpdatePackageDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.service.updatePackage({ ...param, ...dto });
+    return this.service.updatePackage({
+      ...param,
+      ...dto,
+      image: file.filename,
+    });
   }
 
   @Delete()
