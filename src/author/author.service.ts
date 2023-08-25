@@ -33,7 +33,7 @@ export class AuthorService extends BaseService<Author> {
   preResponse(authors: Author[]) {
     authors.map((author) => {
       if (author.image) author.image = this.urlService.uploadUrl(author.image);
-      if (author.audioBook.length > 0) {
+      if (author?.audioBook?.length > 0) {
         author.audioBook.map((audioBook) => {
           if (audioBook.image)
             audioBook.image = this.urlService.uploadUrl(audioBook.image);
