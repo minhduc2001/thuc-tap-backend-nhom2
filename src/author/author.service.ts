@@ -33,6 +33,12 @@ export class AuthorService extends BaseService<Author> {
   preResponse(authors: Author[]) {
     authors.map((author) => {
       if (author.image) author.image = this.urlService.uploadUrl(author.image);
+      if (author.audioBook.length > 0) {
+        author.audioBook.map((audioBook) => {
+          if (audioBook.image)
+            audioBook.image = this.urlService.uploadUrl(audioBook.image);
+        });
+      }
     });
   }
 
@@ -40,6 +46,18 @@ export class AuthorService extends BaseService<Author> {
     const config: PaginateConfig<Author> = {
       sortableColumns: ['id'],
       searchableColumns: ['name'],
+    };
+
+    const resp = await this.listWithPage(query, config);
+    this.preResponse(resp.results);
+    return resp;
+  }
+
+  async listAuthorAudioBook(query: ListAuthorDto) {
+    const config: PaginateConfig<Author> = {
+      sortableColumns: ['id'],
+      searchableColumns: ['name'],
+      relations: ['audioBook'],
     };
 
     const resp = await this.listWithPage(query, config);

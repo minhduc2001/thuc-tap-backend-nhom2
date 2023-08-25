@@ -49,6 +49,12 @@ export class AuthorController {
     return this.service.listAuthor(query);
   }
 
+  @ApiOperation({ summary: 'Lấy danh sách tác giả' })
+  @Get('search')
+  async search(@Query() query: ListAuthorDto) {
+    return this.service.listAuthorAudioBook(query);
+  }
+
   @ApiOperation({ summary: 'Lấy ra 1 tác giả' })
   @Get(':id')
   async getAuthor(@Param() param: ParamIdDto) {
