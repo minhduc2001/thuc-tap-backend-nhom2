@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from './base/config';
 import { LoggerModule } from './base/logger/logger.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -23,6 +23,8 @@ import { UploadFileModule } from './base/multer/multer.module';
 import { RoleModule } from './role/role.module';
 import { SupportModule } from './support/support.module';
 import { RedisModule } from './base/redis/redis.module';
+import { StaticMiddleware } from '@base/middlewares/static.middleware';
+import { AppController } from '@/app.controller';
 
 const baseModules = [
   ConfigModule,
@@ -55,7 +57,11 @@ const appModules = [
     MailerModule,
     SupportModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(StaticMiddleware).forRoutes('/');
+  }
+}

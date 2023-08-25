@@ -11,15 +11,20 @@ import { HttpExceptionFilter } from './base/middlewares/http-exception.filter';
 import { LoggerService } from './base/logger/logger.service';
 import { SwaggerConfig } from './base/swagger/swagger.config';
 import { config } from './base/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as path from 'path';
+import * as process from 'process';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const loggerService = app.get(LoggerService);
   const logger = loggerService.getLogger();
 
   app.enableCors();
-  app.use(`/uploads`, express.static('uploads'));
-  app.use(`/audio`, express.static('audio'));
+  app.useStaticAssets(path.join(process.cwd(), '/audio'));
+  app.useStaticAssets(path.join(process.cwd(), '/uploads'));
+  // app.use(`/uploads`, express.static('uploads'));
+  // app.use(`/audio`, express.static('audio'));
   app.use(bodyParser.json({ limit: '200mb' }));
   app.use(cookieParser());
   app.use(morgan('dev'));

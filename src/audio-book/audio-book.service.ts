@@ -67,8 +67,6 @@ export class AudioBookService extends BaseService<AudioBook> {
   }
 
   async listAudioBook(query: ListAudioBookDto) {
-    console.log(query.filter);
-
     const config: PaginateConfig<AudioBook> = {
       sortableColumns: ['updatedAt', 'title'],
       defaultSortBy: [['updatedAt', 'DESC']],
@@ -90,6 +88,17 @@ export class AudioBookService extends BaseService<AudioBook> {
     console.log(dto);
 
     await this.preResponse([audioBook], dto.user);
+    return audioBook;
+  }
+
+  async getAudioBookUrl(url: string, user: User) {
+    const audioBook = await this.repository.findOne({
+      where: { url: url },
+    });
+    if (!audioBook)
+      throw new exc.BadRequest({ message: 'Không tồn tại audio book' });
+
+    await this.preResponse([audioBook], user);
     return audioBook;
   }
 

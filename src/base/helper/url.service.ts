@@ -13,16 +13,16 @@ export class UrlService {
 
   uploadUrl(filename: string): string {
     if (filename.includes('http')) return filename;
-    // return `https://373d-14-232-135-216.ngrok-free.app/uploads/${filename}`;
-    return `http://${config.IP}:${config.PORT}/uploads/${filename}`;
+    // return `https://9df8-14-232-135-216.ngrok-free.app/api/v1/uploads/${filename}`;
+    return `http://${config.IP}:${config.PORT}/api/v1/uploads/${filename}`;
   }
 
   dataUrl(filename: string): string {
     if (filename.includes('http')) return filename;
-    // return `https://373d-14-232-135-216.ngrok-free.app/audio/${
+    // return `https://9df8-14-232-135-216.ngrok-free.app/api/v1/audio/${
     //   filename.split('.')[0]
     // }/${filename}`;
-    return `http://${config.IP}:${config.PORT}/audio/${
+    return `http://${config.IP}:${config.PORT}/api/v1/audio/${
       filename.split('.')[0]
     }/${filename}`;
   }
@@ -30,7 +30,7 @@ export class UrlService {
   uploadUrls(filenames: string[]) {
     return filenames.map((filename) => {
       if (filename.includes('http')) return filename;
-      return `http://${config.IP}:${config.PORT}/uploads/${filename}`;
+      return `http://${config.IP}:${config.PORT}/api/v1/uploads/${filename}`;
     });
   }
 }
