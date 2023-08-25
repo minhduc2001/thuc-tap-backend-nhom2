@@ -26,7 +26,7 @@ export class AppController {
   ) {
     if (name.includes('.m3u8')) {
       const audioBook = await this.audioService.getAudioBookUrl(name, user);
-      if (user.role == ERole.Admin || user.packageId || !audioBook.free)
+      if (user.role == ERole.Admin || user.packageId || audioBook.free)
         res.sendFile(path.join(process.cwd(), '/audio', `/${folder}/${name}`));
       else res.status(404).json(false);
     } else {
