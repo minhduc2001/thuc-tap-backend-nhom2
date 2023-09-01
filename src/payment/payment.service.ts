@@ -122,7 +122,7 @@ export class PaymentService extends BaseService<Payment> {
         res.payUrl,
       );
 
-      return true;
+      return res.payUrl;
     } catch (e) {
       this.logger.warn(e);
       throw new exc.BadRequest({ message: e.message });

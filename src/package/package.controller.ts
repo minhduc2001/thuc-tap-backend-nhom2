@@ -37,7 +37,7 @@ export class PackageController {
     @Body() dto: CreatePackageDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.service.createPackage({ ...dto, image: file.filename });
+    return this.service.createPackage({ ...dto, image: file?.filename });
   }
 
   @Get()

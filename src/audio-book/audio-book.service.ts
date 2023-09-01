@@ -46,11 +46,11 @@ export class AudioBookService extends BaseService<AudioBook> {
 
   logger = this.loggerService.getLogger(AudioBookService.name);
 
-  async preResponse(audioBooks: AudioBook[], user: User) {
+  async preResponse(audioBooks: AudioBook[], user?: User) {
     for (const audioBook of audioBooks) {
       if (
         audioBook.url &&
-        (user.role === 'admin' || user.packageId || audioBook.free)
+        (user?.role === 'admin' || user?.packageId || audioBook.free)
       )
         audioBook.url = this.urlService.dataUrl(audioBook.url);
       else audioBook.url = '';
@@ -75,6 +75,18 @@ export class AudioBookService extends BaseService<AudioBook> {
     };
     const data = await this.listWithPage(query, config);
     await this.preResponse(data.results, query.user);
+    return data;
+  }
+
+  async listAudioBookWithoutLogin(query: ListAudioBookDto) {
+    const config: PaginateConfig<AudioBook> = {
+      sortableColumns: ['updatedAt', 'title'],
+      defaultSortBy: [['updatedAt', 'DESC']],
+      searchableColumns: ['title'],
+      relations: ['author', 'genre'],
+    };
+    const data = await this.listWithPage(query, config);
+    await this.preResponse(data.results);
     return data;
   }
 

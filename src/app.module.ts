@@ -62,6 +62,6 @@ const appModules = [
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(StaticMiddleware).forRoutes('/');
+    consumer.apply(StaticMiddleware).forRoutes('/audio');
   }
 }

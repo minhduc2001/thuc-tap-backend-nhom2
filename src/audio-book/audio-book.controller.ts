@@ -69,6 +69,13 @@ export class AudioBookController {
     return this.service.listAudioBook({ ...query, user: user });
   }
 
+  @ApiOperation({ summary: 'lấy danh sách audio book' })
+  @Public()
+  @Get('/public')
+  async listAudioBookWithoutLogin(@Query() query: ListAudioBookDto) {
+    return this.service.listAudioBookWithoutLogin({ ...query });
+  }
+
   @Public()
   @Get('/play')
   async play(@Query('songName') songName: string) {

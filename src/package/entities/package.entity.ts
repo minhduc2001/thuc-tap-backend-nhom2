@@ -35,4 +35,7 @@ export class Package extends AbstractEntity {
   @OneToMany(() => Payment, (payment) => payment.package)
   @JoinColumn()
   payments: Payment[];
+
+  @Column({ nullable: true, default: 0 })
+  discount: number;
 }

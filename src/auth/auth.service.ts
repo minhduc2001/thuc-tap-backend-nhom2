@@ -73,7 +73,13 @@ export class AuthService {
       `Ma se het han sau 10 phut : ${otp}`,
     );
 
-    return true;
+    const payload: IJWTPayload = {
+      sub: user.id,
+      uav: new Date().getTime(),
+    };
+
+    const { accessToken } = await this.getTokens(payload);
+    return { accessToken: accessToken };
   }
 
   async activeUser(dto: ActiveUserDto) {

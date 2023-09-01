@@ -26,6 +26,7 @@ export class CreatePackageDto extends UploadImageDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @ToNumber()
   @IsEnum(EPackageExpire)
   expire: EPackageExpire;
 
@@ -34,6 +35,12 @@ export class CreatePackageDto extends UploadImageDto {
   @IsString()
   @Trim()
   description: string;
+
+  @ApiProperty()
+  @IsOptional()
+  @ToNumber()
+  @IsPositive()
+  discount: number;
 }
 
 export class UpdatePackageDto extends PickType(CreatePackageDto, [
