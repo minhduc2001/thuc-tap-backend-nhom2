@@ -44,6 +44,7 @@
     "googleapis": "^122.0.0",
     "ip": "^1.1.8",
     "log4js": "^6.9.1",
+    "moment": "^2.29.4",
     "momo-payment-api": "^1.0.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
@@ -54,6 +55,7 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.11.1",
+    "qs": "^6.11.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17"

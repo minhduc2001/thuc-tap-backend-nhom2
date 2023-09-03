@@ -6,4 +6,5 @@ export enum EStatePayment {
 
 export enum EMethodPayment {
   Momo,
+  VNPAY,
 }

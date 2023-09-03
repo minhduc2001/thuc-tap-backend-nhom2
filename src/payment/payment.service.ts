@@ -21,6 +21,7 @@ import {
   IResponseSuccessPayment,
 } from 'momo-payment-api/src/type';
 import { MailerService } from '@/mailer/mailer.service';
+import { VnpayService } from '@base/helper/vnpay.service';
 
 @Injectable()
 export class PaymentService extends BaseService<Payment> {
@@ -36,6 +37,7 @@ export class PaymentService extends BaseService<Payment> {
     private readonly redisService: RedisService,
     private readonly subscriptionService: SubscriptionService,
     private readonly mailerService: MailerService,
+    private readonly vnpayService: VnpayService,
   ) {
     super(repository);
     this.redisSubscriber = new Redis();
@@ -100,15 +102,32 @@ export class PaymentService extends BaseService<Payment> {
         orderId: `ORD${dto.user.id}${date}`,
       });
 
-      const res: IResponsePayment = await this.momoPayment.createPayment({
-        requestId: payment.requestId,
-        orderId: payment.orderId,
-        amount: payment.package.amount,
-        orderInfo: `Thanh toán Momo`,
-        ipnUrl:
-          'https://dbfa-2405-4802-1ed1-f900-5673-2066-d60d-4979.ngrok.io/api/v1/payment/success',
-        redirectUrl: 'http://localhost:3000',
-      });
+      let responsePayment = { payUrl: '' };
+
+      switch (dto.methodPayment) {
+        case EMethodPayment.Momo:
+          const resp: IResponsePayment = await this.momoPayment.createPayment({
+            requestId: payment.requestId,
+            orderId: payment.orderId,
+            amount: payment.package.amount,
+            orderInfo: `Thanh toán Momo`,
+            ipnUrl:
+              'https://dbfa-2405-4802-1ed1-f900-5673-2066-d60d-4979.ngrok.io/api/v1/payment/success',
+            redirectUrl: 'http://localhost:3000',
+          });
+          responsePayment = resp;
+          break;
+        case EMethodPayment.VNPAY:
+          const res = await this.vnpayService.createPayment({
+            amount: 10000,
+            orderId: payment.orderId,
+            orderInfo: `Thanh toán VNPAY`,
+          });
+          responsePayment = res;
+          break;
+        default:
+          break;
+      }
 
       await this.redisService.setWithExpiration(
         `transaction:${payment.id}`,
@@ -119,10 +138,10 @@ export class PaymentService extends BaseService<Payment> {
       await this.mailerService.sendMail(
         dto.user.email,
         'Thanh toán gói cước',
-        res.payUrl,
+        responsePayment.payUrl,
       );
 
-      return res.payUrl;
+      return responsePayment.payUrl;
     } catch (e) {
       this.logger.warn(e);
       throw new exc.BadRequest({ message: e.message });

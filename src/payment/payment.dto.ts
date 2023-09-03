@@ -1,7 +1,14 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsPositive } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+} from 'class-validator';
 import { ToNumber } from '@base/decorators/common.decorator';
 import { User } from '@/user/user.entity';
+import { EMethodPayment } from '@/payment/payment.enum';
 
 export class CreatePaymentDto {
   @ApiProperty()
@@ -9,6 +16,12 @@ export class CreatePaymentDto {
   @ToNumber()
   @IsPositive()
   packageId: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @ToNumber()
+  @IsEnum(EMethodPayment)
+  methodPayment: EMethodPayment;
 
   @ApiHideProperty()
   @IsOptional()

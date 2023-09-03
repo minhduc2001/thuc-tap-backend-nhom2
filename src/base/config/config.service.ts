@@ -59,6 +59,13 @@ export class ConfigService {
   MOMO_SECRET_KEY = _process.env.MOMO_SECRET_KEY;
   MOMO_ENVIRONMENT = _process.env.MOMO_ENVIRONMENT ?? 'development';
 
+  // vnpay
+  VNP_TMNCODE = _process.env.VNP_TMNCODE;
+  VNP_HASH_SECRET = _process.env.VNP_HASH_SECRET;
+  VNP_URL = _process.env.VNP_URL;
+  VNP_API = _process.env.VNP_API;
+  VNP_RETURN_URL = _process.env.VNP_RETURN_URL;
+
   // Redis
   REDIS_HOST = _process.env.REDIS_HOST;
   REDIS_PORT = +_process.env.REDIS_PORT;
