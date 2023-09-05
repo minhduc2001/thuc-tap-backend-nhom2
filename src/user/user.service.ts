@@ -17,6 +17,8 @@ import {
 import { ListUserDto, UploadAvatarDto } from '@/user/dtos/user.dto';
 import { LibraryService } from '@/library/services/library.service';
 import { UrlService } from '@/base/helper/url.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { MailerService } from '@/mailer/mailer.service';
 
 @Injectable()
 export class UserService extends BaseService<User> {
@@ -26,11 +28,40 @@ export class UserService extends BaseService<User> {
     private readonly loggerService: LoggerService,
     private readonly libraryService: LibraryService,
     private readonly urlService: UrlService,
+    private readonly mailerService: MailerService,
   ) {
     super(repository);
   }
 
   logger = this.loggerService.getLogger(UserService.name);
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async rejectPackegeUser() {
+    const currentTime = new Date();
+    const users = await this.repository
+      .createQueryBuilder('user')
+      .where(`user.packageExpire BETWEEN :gt1 AND :gt2`, {
+        gt1: currentTime.getTime() - currentTime.getHours() * 3600 * 1000,
+        gt2:
+          currentTime.getTime() + (24 - currentTime.getHours()) * 3600 * 1000,
+      })
+      .getMany();
+
+    for (const user of users) {
+      await this.mailerService.sendMail(
+        user.email,
+        'Thông báo hết hạn gói cước',
+        `Gói cước của bạn hết hạn vào lúc ${new Date(user.packageExpire)}`,
+      );
+    }
+
+    // await this.subscriptionService.createSubscription({
+    //   userId: user.id,
+    //   delay: Number(user.packageExpire) - date,
+    // });
+
+    console.log(users);
+  }
 
   preResponse(users: User[]) {
     users.map((user) => {

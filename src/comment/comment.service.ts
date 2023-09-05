@@ -38,7 +38,9 @@ export class CommentService extends BaseService<Comment> {
   }
 
   async createComment(dto: CreateCommentDto) {
-    const audioBook = await this.audioBookService.getAudioBook(dto.audioBook);
+    const audioBook = await this.audioBookService.getAudioBookWithoutImage(
+      dto.audioBook,
+    );
 
     // get reply user
     let user = null;

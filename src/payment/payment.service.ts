@@ -119,7 +119,7 @@ export class PaymentService extends BaseService<Payment> {
           break;
         case EMethodPayment.VNPAY:
           const res = await this.vnpayService.createPayment({
-            amount: 10000,
+            amount: payment.package.amount,
             orderId: payment.orderId,
             orderInfo: `Thanh toán VNPAY`,
           });
@@ -161,6 +161,7 @@ export class PaymentService extends BaseService<Payment> {
 
   async confirmPayment(body: IResponseSuccessPayment) {
     try {
+      if (body.resultCode != 0) return false;
       const payment = await this.getPaymentWithOrderId(body.orderId);
       if (
         payment.state == EStatePayment.Failure ||
